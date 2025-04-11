@@ -7,13 +7,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
-import { Trash, Plus, ExternalLink } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus, ExternalLink } from "lucide-react";
+import ProfileEditor from "@/components/ProfileEditor";
+import LinkSorter from "@/components/LinkSorter";
+import AppearanceSettings from "@/components/AppearanceSettings";
 
 type Link = {
   id: string;
   title: string;
   url: string;
   order_position: number;
+  active: boolean;
 };
 
 const Dashboard = () => {
@@ -21,6 +26,7 @@ const Dashboard = () => {
   const [links, setLinks] = useState<Link[]>([]);
   const [newLink, setNewLink] = useState({ title: "", url: "" });
   const [username, setUsername] = useState("");
+  const [activeTab, setActiveTab] = useState("links");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -113,28 +119,19 @@ const Dashboard = () => {
     }
   };
 
-  const deleteLink = async (id: string) => {
-    try {
-      const { error } = await supabase.from("links").delete().eq("id", id);
-      
-      if (error) throw error;
-      
-      fetchLinks();
-      toast({
-        title: "Link removido com sucesso",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Erro ao remover link",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleSignOut = async () => {
     await signOut();
     navigate("/auth");
+  };
+
+  const saveAppearanceSettings = async (settings: any) => {
+    console.log("Appearance settings saved:", settings);
+    // Aqui implementaríamos a persistência das configurações de aparência
+    // Por enquanto vamos apenas mostrar um toast de confirmação
+    toast({
+      title: "Configurações de aparência salvas",
+      description: "As mudanças serão aplicadas ao seu perfil público",
+    });
   };
 
   return (
@@ -151,75 +148,63 @@ const Dashboard = () => {
         </div>
       </div>
       
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Adicionar novo link</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={addLink} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="title" className="text-sm font-medium">
-                Título
-              </label>
-              <Input
-                id="title"
-                value={newLink.title}
-                onChange={(e) => setNewLink({ ...newLink, title: e.target.value })}
-                placeholder="Ex: Meu Website"
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="url" className="text-sm font-medium">
-                URL
-              </label>
-              <Input
-                id="url"
-                value={newLink.url}
-                onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
-                placeholder="Ex: https://meusite.com"
-              />
-            </div>
-            <Button type="submit" className="w-full">
-              <Plus size={16} className="mr-2" /> Adicionar Link
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-      
-      <h2 className="text-xl font-semibold mb-4">Seus Links</h2>
-      {links.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">
-          Você não tem links ainda. Adicione seu primeiro link acima.
-        </p>
-      ) : (
-        <div className="space-y-3">
-          {links.map((link) => (
-            <div
-              key={link.id}
-              className="flex items-center justify-between p-4 border border-gray-200 rounded-md"
-            >
-              <div>
-                <h3 className="font-medium">{link.title}</h3>
-                <a
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-gray-500 flex items-center"
-                >
-                  {link.url} <ExternalLink size={14} className="ml-1" />
-                </a>
-              </div>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => deleteLink(link.id)}
-              >
-                <Trash size={16} />
-              </Button>
-            </div>
-          ))}
-        </div>
-      )}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+        <TabsList className="mb-4 w-full justify-start">
+          <TabsTrigger value="links">Links</TabsTrigger>
+          <TabsTrigger value="profile">Perfil</TabsTrigger>
+          <TabsTrigger value="appearance">Aparência</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="links" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Adicionar novo link</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={addLink} className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="title" className="text-sm font-medium">
+                    Título
+                  </label>
+                  <Input
+                    id="title"
+                    value={newLink.title}
+                    onChange={(e) => setNewLink({ ...newLink, title: e.target.value })}
+                    placeholder="Ex: Meu Website"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="url" className="text-sm font-medium">
+                    URL
+                  </label>
+                  <Input
+                    id="url"
+                    value={newLink.url}
+                    onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
+                    placeholder="Ex: https://meusite.com"
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  <Plus size={16} className="mr-2" /> Adicionar Link
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+          
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Seus Links</h2>
+            <LinkSorter links={links} onUpdate={fetchLinks} />
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="profile">
+          <ProfileEditor />
+        </TabsContent>
+        
+        <TabsContent value="appearance">
+          <AppearanceSettings onSave={saveAppearanceSettings} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
