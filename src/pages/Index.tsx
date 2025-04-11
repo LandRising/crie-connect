@@ -9,7 +9,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4">
       <div className="max-w-md w-full text-center">
-        <h1 className="text-4xl font-bold mb-4">LinkSplash</h1>
+        <h1 className="text-4xl font-bold mb-4">Crie Connect</h1>
         <p className="text-xl text-gray-600 mb-8">
           Uma forma simples de compartilhar todos os seus links em um só lugar.
         </p>
