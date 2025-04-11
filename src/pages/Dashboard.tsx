@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +20,15 @@ type Link = {
   order_position: number;
   active: boolean;
 };
+
+interface AppearanceSettingsData {
+  id: string;
+  user_id: string;
+  button_style: string;
+  theme: string;
+  created_at: string;
+  updated_at: string;
+}
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -87,12 +97,12 @@ const Dashboard = () => {
       if (!user) return;
       
       const { data, error } = await supabase
-        .from('appearance_settings')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+        .from("appearance_settings")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
         
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Erro ao buscar configurações de aparência:', error);
         return;
       }

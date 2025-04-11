@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -26,6 +25,15 @@ const defaultSettings: AppearanceSettings = {
   theme: "light",
 };
 
+interface AppearanceSettingsData {
+  id: string;
+  user_id: string;
+  button_style: ButtonStyle;
+  theme: "light" | "dark";
+  created_at: string;
+  updated_at: string;
+}
+
 const AppearanceSettings = ({ 
   initialSettings = defaultSettings, 
   onSave 
@@ -41,10 +49,10 @@ const AppearanceSettings = ({
       
       try {
         const { data, error } = await supabase
-          .from('appearance_settings')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
+          .from("appearance_settings")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle();
           
         if (error) {
           console.error('Erro ao carregar configurações de aparência:', error);
@@ -73,13 +81,13 @@ const AppearanceSettings = ({
     try {
       // Check if settings already exist for this user
       const { data, error: fetchError } = await supabase
-        .from('appearance_settings')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
+        .from("appearance_settings")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
       
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        throw fetchError;
+      if (fetchError) {
+        console.error('Erro ao verificar configurações existentes:', fetchError);
       }
       
       const settingsData = {
@@ -94,14 +102,14 @@ const AppearanceSettings = ({
       if (data) {
         // Update existing settings
         ({ error } = await supabase
-          .from('appearance_settings')
+          .from("appearance_settings")
           .update(settingsData)
-          .eq('id', data.id));
+          .eq("id", data.id));
       } else {
         // Insert new settings
         ({ error } = await supabase
-          .from('appearance_settings')
-          .insert([settingsData]));
+          .from("appearance_settings")
+          .insert(settingsData));
       }
       
       if (error) throw error;

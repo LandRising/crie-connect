@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AppearanceSettings } from "@/components/AppearanceSettings";
+import { ButtonStyle } from "@/components/AppearanceSettings";
 
 type ProfileLink = {
   id: string;
@@ -14,10 +14,15 @@ type ProfileLink = {
 };
 
 type ProfileData = {
+  id: string;
   username: string;
   full_name: string | null;
   avatar_url: string | null;
-  user_id: string;
+};
+
+type AppearanceSettings = {
+  buttonStyle: ButtonStyle;
+  theme: "light" | "dark";
 };
 
 // Default appearance settings
@@ -66,9 +71,9 @@ const Profile = () => {
           .from("appearance_settings")
           .select("*")
           .eq("user_id", profileData.id)
-          .single();
+          .maybeSingle();
           
-        if (appearanceError && appearanceError.code !== 'PGRST116') {
+        if (appearanceError) {
           console.error('Erro ao buscar configurações de aparência:', appearanceError);
         }
         
