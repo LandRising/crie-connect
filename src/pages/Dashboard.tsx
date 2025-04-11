@@ -169,7 +169,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-white p-4 max-w-2xl mx-auto">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">CRIE Connect</h1>
+        <h1 className="text-2xl font-bold">CRIEConnect</h1>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => navigate(`/${username}`)}>
             Visualizar página
