@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AppearanceSettings } from "@/components/AppearanceSettings";
 
 type ProfileLink = {
   id: string;
@@ -16,10 +17,11 @@ type ProfileData = {
   username: string;
   full_name: string | null;
   avatar_url: string | null;
+  user_id: string;
 };
 
 // Default appearance settings
-const defaultAppearance = {
+const defaultAppearance: AppearanceSettings = {
   buttonStyle: "default",
   theme: "light",
 };
@@ -30,7 +32,7 @@ const Profile = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [appearance, setAppearance] = useState(defaultAppearance);
+  const [appearance, setAppearance] = useState<AppearanceSettings>(defaultAppearance);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -59,9 +61,23 @@ const Profile = () => {
         if (linksError) throw linksError;
         setLinks(linksData || []);
         
-        // Here we would fetch appearance settings from a database table
-        // For now, we'll just use the default settings
-        // Future implementation would involve fetching from a user_settings table
+        // Fetch appearance settings
+        const { data: appearanceData, error: appearanceError } = await supabase
+          .from("appearance_settings")
+          .select("*")
+          .eq("user_id", profileData.id)
+          .single();
+          
+        if (appearanceError && appearanceError.code !== 'PGRST116') {
+          console.error('Erro ao buscar configurações de aparência:', appearanceError);
+        }
+        
+        if (appearanceData) {
+          setAppearance({
+            buttonStyle: appearanceData.button_style || defaultAppearance.buttonStyle,
+            theme: appearanceData.theme || defaultAppearance.theme
+          });
+        }
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -169,7 +185,7 @@ const Profile = () => {
       </div>
       
       <footer className={cn("mt-12 text-center text-sm", themeStyles.subtext)}>
-        <p>Criado com LinkSplash</p>
+        <p>Criado com CRIE Connect</p>
       </footer>
     </div>
   );

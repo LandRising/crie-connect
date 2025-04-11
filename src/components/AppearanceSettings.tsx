@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
 import { Check } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/components/AuthProvider";
 
-type ButtonStyle = "default" | "outline" | "rounded";
-type AppearanceSettings = {
+export type ButtonStyle = "default" | "outline" | "rounded";
+export type AppearanceSettings = {
   buttonStyle: ButtonStyle;
   theme: "light" | "dark";
 };
@@ -28,13 +30,98 @@ const AppearanceSettings = ({
   initialSettings = defaultSettings, 
   onSave 
 }: AppearanceSettingsProps) => {
+  const { user } = useAuth();
   const [settings, setSettings] = useState<AppearanceSettings>(initialSettings);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSave = () => {
-    onSave(settings);
-    toast({
-      title: "Aparência salva com sucesso",
-    });
+  useEffect(() => {
+    // Fetch settings from database when component mounts
+    const fetchSettings = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('appearance_settings')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+          
+        if (error) {
+          console.error('Erro ao carregar configurações de aparência:', error);
+          return;
+        }
+        
+        if (data) {
+          setSettings({
+            buttonStyle: data.button_style as ButtonStyle || defaultSettings.buttonStyle,
+            theme: data.theme || defaultSettings.theme
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao carregar configurações:', error);
+      }
+    };
+    
+    fetchSettings();
+  }, [user]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    
+    try {
+      // Check if settings already exist for this user
+      const { data, error: fetchError } = await supabase
+        .from('appearance_settings')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        throw fetchError;
+      }
+      
+      const settingsData = {
+        user_id: user.id,
+        button_style: settings.buttonStyle,
+        theme: settings.theme,
+        updated_at: new Date().toISOString()
+      };
+      
+      let error;
+      
+      if (data) {
+        // Update existing settings
+        ({ error } = await supabase
+          .from('appearance_settings')
+          .update(settingsData)
+          .eq('id', data.id));
+      } else {
+        // Insert new settings
+        ({ error } = await supabase
+          .from('appearance_settings')
+          .insert([settingsData]));
+      }
+      
+      if (error) throw error;
+      
+      onSave(settings);
+      
+      toast({
+        title: "Aparência salva com sucesso",
+        description: "Suas configurações foram atualizadas"
+      });
+    } catch (error: any) {
+      console.error('Erro ao salvar configurações:', error);
+      toast({
+        title: "Erro ao salvar configurações",
+        description: error.message || "Tente novamente mais tarde",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -126,7 +213,9 @@ const AppearanceSettings = ({
         </Tabs>
         
         <div className="mt-6 flex justify-end">
-          <Button onClick={handleSave}>Salvar Aparência</Button>
+          <Button onClick={handleSave} disabled={isLoading}>
+            {isLoading ? "Salvando..." : "Salvar Aparência"}
+          </Button>
         </div>
       </CardContent>
     </Card>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, ExternalLink } from "lucide-react";
 import ProfileEditor from "@/components/ProfileEditor";
 import LinkSorter from "@/components/LinkSorter";
-import AppearanceSettings from "@/components/AppearanceSettings";
+import AppearanceSettings, { AppearanceSettings as AppearanceSettingsType } from "@/components/AppearanceSettings";
 
 type Link = {
   id: string;
@@ -27,6 +26,7 @@ const Dashboard = () => {
   const [newLink, setNewLink] = useState({ title: "", url: "" });
   const [username, setUsername] = useState("");
   const [activeTab, setActiveTab] = useState("links");
+  const [appearanceSettings, setAppearanceSettings] = useState<AppearanceSettingsType | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,6 +37,7 @@ const Dashboard = () => {
     
     fetchLinks();
     fetchProfile();
+    fetchAppearanceSettings();
   }, [user, navigate]);
 
   const fetchLinks = async () => {
@@ -78,6 +79,32 @@ const Dashboard = () => {
         description: error.message,
         variant: "destructive",
       });
+    }
+  };
+
+  const fetchAppearanceSettings = async () => {
+    try {
+      if (!user) return;
+      
+      const { data, error } = await supabase
+        .from('appearance_settings')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+        
+      if (error && error.code !== 'PGRST116') {
+        console.error('Erro ao buscar configurações de aparência:', error);
+        return;
+      }
+      
+      if (data) {
+        setAppearanceSettings({
+          buttonStyle: data.button_style || "default",
+          theme: data.theme || "light"
+        });
+      }
+    } catch (error: any) {
+      console.error('Erro ao buscar configurações de aparência:', error);
     }
   };
 
@@ -124,20 +151,15 @@ const Dashboard = () => {
     navigate("/auth");
   };
 
-  const saveAppearanceSettings = async (settings: any) => {
-    console.log("Appearance settings saved:", settings);
-    // Aqui implementaríamos a persistência das configurações de aparência
-    // Por enquanto vamos apenas mostrar um toast de confirmação
-    toast({
-      title: "Configurações de aparência salvas",
-      description: "As mudanças serão aplicadas ao seu perfil público",
-    });
+  const saveAppearanceSettings = async (settings: AppearanceSettingsType) => {
+    setAppearanceSettings(settings);
+    fetchAppearanceSettings(); // Refresh settings after save
   };
 
   return (
     <div className="min-h-screen bg-white p-4 max-w-2xl mx-auto">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <h1 className="text-2xl font-bold">CRIE Connect</h1>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => navigate(`/${username}`)}>
             Visualizar página
@@ -202,7 +224,10 @@ const Dashboard = () => {
         </TabsContent>
         
         <TabsContent value="appearance">
-          <AppearanceSettings onSave={saveAppearanceSettings} />
+          <AppearanceSettings 
+            initialSettings={appearanceSettings || undefined} 
+            onSave={saveAppearanceSettings} 
+          />
         </TabsContent>
       </Tabs>
     </div>
