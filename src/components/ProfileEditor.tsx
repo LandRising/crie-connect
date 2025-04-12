@@ -1,17 +1,21 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, PenLine } from "lucide-react";
+import { User, PenLine, Camera, ImageIcon } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type ProfileData = {
   username: string;
   full_name: string | null;
   avatar_url: string | null;
+  cover_url: string | null;
+  bio: string | null;
 };
 
 const ProfileEditor = () => {
@@ -21,8 +25,14 @@ const ProfileEditor = () => {
     username: "",
     full_name: "",
     avatar_url: null,
+    cover_url: null,
+    bio: null,
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
 
   // Fetch profile data
   const fetchProfile = async () => {
@@ -31,7 +41,7 @@ const ProfileEditor = () => {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("username, full_name, avatar_url")
+        .select("username, full_name, avatar_url, cover_url, bio")
         .eq("id", user.id)
         .single();
 
@@ -42,6 +52,8 @@ const ProfileEditor = () => {
           username: data.username || "",
           full_name: data.full_name || "",
           avatar_url: data.avatar_url,
+          cover_url: data.cover_url,
+          bio: data.bio,
         });
       }
     } catch (error: any) {
@@ -53,6 +65,51 @@ const ProfileEditor = () => {
     }
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'cover') => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (type === 'avatar') {
+        setAvatarFile(file);
+        setAvatarPreview(reader.result as string);
+      } else {
+        setCoverFile(file);
+        setCoverPreview(reader.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Upload file to Supabase Storage
+  const uploadFile = async (file: File, path: string): Promise<string | null> => {
+    if (!user) return null;
+    
+    const fileName = `${user.id}-${Date.now()}`;
+    const filePath = `${path}/${fileName}`;
+    
+    const { data, error } = await supabase.storage
+      .from("profiles")
+      .upload(filePath, file);
+      
+    if (error) {
+      toast({
+        title: "Erro ao fazer upload",
+        description: error.message,
+        variant: "destructive",
+      });
+      return null;
+    }
+    
+    const { data: { publicUrl } } = supabase.storage
+      .from("profiles")
+      .getPublicUrl(filePath);
+      
+    return publicUrl;
+  };
+
   // Save profile changes
   const saveProfile = async () => {
     if (!user) return;
@@ -60,6 +117,19 @@ const ProfileEditor = () => {
     setIsLoading(true);
     
     try {
+      let avatarUrl = profile.avatar_url;
+      let coverUrl = profile.cover_url;
+      
+      // Upload avatar if changed
+      if (avatarFile) {
+        avatarUrl = await uploadFile(avatarFile, 'avatars');
+      }
+      
+      // Upload cover if changed
+      if (coverFile) {
+        coverUrl = await uploadFile(coverFile, 'covers');
+      }
+      
       // Check if username is already taken (if changed)
       if (profile.username) {
         const { data: existingUser, error: checkError } = await supabase
@@ -88,7 +158,9 @@ const ProfileEditor = () => {
         .update({
           username: profile.username.toLowerCase(),
           full_name: profile.full_name,
-          avatar_url: profile.avatar_url,
+          avatar_url: avatarUrl,
+          cover_url: coverUrl,
+          bio: profile.bio,
           updated_at: new Date().toISOString(),
         })
         .eq("id", user.id);
@@ -100,6 +172,9 @@ const ProfileEditor = () => {
       });
       
       setIsEditing(false);
+      setAvatarFile(null);
+      setCoverFile(null);
+      fetchProfile();
     } catch (error: any) {
       toast({
         title: "Erro ao atualizar perfil",
@@ -112,9 +187,9 @@ const ProfileEditor = () => {
   };
 
   // Load profile when component mounts or user changes
-  useState(() => {
+  useEffect(() => {
     fetchProfile();
-  });
+  }, [user]);
 
   if (!isEditing) {
     return (
@@ -127,12 +202,21 @@ const ProfileEditor = () => {
         </CardHeader>
         <CardContent>
           <div className="flex items-center space-x-4">
-            <div className="bg-gray-200 rounded-full p-3">
-              <User size={24} />
-            </div>
+            <Avatar className="h-16 w-16">
+              {profile.avatar_url ? (
+                <AvatarImage src={profile.avatar_url} alt={profile.full_name || profile.username} />
+              ) : (
+                <AvatarFallback>
+                  <User size={24} />
+                </AvatarFallback>
+              )}
+            </Avatar>
             <div>
               <p className="font-medium">{profile.full_name || profile.username}</p>
               <p className="text-sm text-gray-500">@{profile.username}</p>
+              {profile.bio && (
+                <p className="mt-1 text-sm">{profile.bio}</p>
+              )}
             </div>
           </div>
         </CardContent>
@@ -153,6 +237,70 @@ const ProfileEditor = () => {
             saveProfile();
           }}
         >
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Foto de Perfil</label>
+              <div className="flex flex-col items-center gap-2">
+                <Avatar className="h-24 w-24">
+                  {avatarPreview ? (
+                    <AvatarImage src={avatarPreview} alt="Preview" />
+                  ) : profile.avatar_url ? (
+                    <AvatarImage src={profile.avatar_url} alt={profile.full_name || profile.username} />
+                  ) : (
+                    <AvatarFallback>
+                      <User size={32} />
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <label htmlFor="avatar-upload" className="cursor-pointer">
+                  <Button type="button" variant="outline" size="sm" asChild>
+                    <span>
+                      <Camera size={14} className="mr-1" /> Alterar
+                    </span>
+                  </Button>
+                  <input
+                    id="avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => handleFileChange(e, 'avatar')}
+                  />
+                </label>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Foto de Capa</label>
+              <div className="flex flex-col items-center gap-2">
+                <div className="relative h-24 w-full bg-gray-100 rounded-md overflow-hidden">
+                  {coverPreview ? (
+                    <img src={coverPreview} alt="Cover preview" className="w-full h-full object-cover" />
+                  ) : profile.cover_url ? (
+                    <img src={profile.cover_url} alt="Cover" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="flex items-center justify-center h-full w-full">
+                      <ImageIcon size={32} className="text-gray-400" />
+                    </div>
+                  )}
+                </div>
+                <label htmlFor="cover-upload" className="cursor-pointer">
+                  <Button type="button" variant="outline" size="sm" asChild>
+                    <span>
+                      <ImageIcon size={14} className="mr-1" /> Alterar
+                    </span>
+                  </Button>
+                  <input
+                    id="cover-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => handleFileChange(e, 'cover')}
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-2">
             <label htmlFor="username" className="text-sm font-medium">
               Nome de Usuário
@@ -182,6 +330,21 @@ const ProfileEditor = () => {
                 setProfile({ ...profile, full_name: e.target.value })
               }
               placeholder="Seu Nome Completo"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="bio" className="text-sm font-medium">
+              Bio
+            </label>
+            <Textarea
+              id="bio"
+              value={profile.bio || ""}
+              onChange={(e) =>
+                setProfile({ ...profile, bio: e.target.value })
+              }
+              placeholder="Conte um pouco sobre você..."
+              rows={3}
             />
           </div>
 

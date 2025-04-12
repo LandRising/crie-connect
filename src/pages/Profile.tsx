@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ButtonStyle, ThemeType } from "@/components/AppearanceSettings";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type ProfileLink = {
   id: string;
@@ -18,6 +19,8 @@ type ProfileData = {
   username: string;
   full_name: string | null;
   avatar_url: string | null;
+  cover_url: string | null;
+  bio: string | null;
 };
 
 type AppearanceSettings = {
@@ -145,20 +148,39 @@ const Profile = () => {
   }
 
   return (
-    <div className={cn("min-h-screen flex flex-col items-center p-4 py-12", themeStyles.background)}>
-      <div className="w-full max-w-md">
+    <div className={cn("min-h-screen flex flex-col items-center", themeStyles.background)}>
+      {/* Cover Image */}
+      {profile.cover_url && (
+        <div className="w-full h-48 relative">
+          <img 
+            src={profile.cover_url} 
+            alt="Cover" 
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
+      <div className="w-full max-w-md px-4 py-12">
         <div className="text-center mb-8">
-          {profile.avatar_url && (
-            <img
-              src={profile.avatar_url}
-              alt={profile.full_name || profile.username}
-              className="w-24 h-24 object-cover rounded-full mx-auto mb-4"
-            />
-          )}
+          <Avatar className="h-24 w-24 mx-auto mb-4">
+            {profile.avatar_url ? (
+              <AvatarImage src={profile.avatar_url} alt={profile.full_name || profile.username} />
+            ) : (
+              <AvatarFallback className="bg-gray-200 text-gray-700">
+                <User size={32} />
+              </AvatarFallback>
+            )}
+          </Avatar>
           <h1 className={cn("text-2xl font-bold", themeStyles.text)}>
             {profile.full_name || profile.username}
           </h1>
           <p className={cn(themeStyles.subtext)}>@{profile.username}</p>
+          
+          {profile.bio && (
+            <p className={cn("mt-3 text-sm max-w-md mx-auto", themeStyles.text)}>
+              {profile.bio}
+            </p>
+          )}
         </div>
 
         <div className="space-y-3">
@@ -189,7 +211,7 @@ const Profile = () => {
         </div>
       </div>
       
-      <footer className={cn("mt-12 text-center text-sm", themeStyles.subtext)}>
+      <footer className={cn("mt-12 text-center text-sm pb-6", themeStyles.subtext)}>
         <p>Criado com CRIE Connect</p>
       </footer>
     </div>
