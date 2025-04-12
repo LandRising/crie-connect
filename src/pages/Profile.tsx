@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ButtonStyle } from "@/components/AppearanceSettings";
+import { ButtonStyle, ThemeType } from "@/components/AppearanceSettings";
 
 type ProfileLink = {
   id: string;
@@ -22,7 +22,7 @@ type ProfileData = {
 
 type AppearanceSettings = {
   buttonStyle: ButtonStyle;
-  theme: "light" | "dark";
+  theme: ThemeType;
 };
 
 // Default appearance settings
@@ -79,8 +79,8 @@ const Profile = () => {
         
         if (appearanceData) {
           setAppearance({
-            buttonStyle: appearanceData.button_style || defaultAppearance.buttonStyle,
-            theme: appearanceData.theme || defaultAppearance.theme
+            buttonStyle: appearanceData.button_style as ButtonStyle || defaultAppearance.buttonStyle,
+            theme: appearanceData.theme as ThemeType || defaultAppearance.theme
           });
         }
       } catch (err: any) {

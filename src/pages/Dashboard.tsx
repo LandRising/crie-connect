@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, ExternalLink } from "lucide-react";
 import ProfileEditor from "@/components/ProfileEditor";
 import LinkSorter from "@/components/LinkSorter";
-import AppearanceSettings, { AppearanceSettings as AppearanceSettingsType } from "@/components/AppearanceSettings";
+import AppearanceSettings, { AppearanceSettings as AppearanceSettingsType, ButtonStyle, ThemeType } from "@/components/AppearanceSettings";
 
 type Link = {
   id: string;
@@ -109,8 +109,8 @@ const Dashboard = () => {
       
       if (data) {
         setAppearanceSettings({
-          buttonStyle: data.button_style || "default",
-          theme: data.theme || "light"
+          buttonStyle: data.button_style as ButtonStyle || "default",
+          theme: data.theme as ThemeType || "light"
         });
       }
     } catch (error: any) {

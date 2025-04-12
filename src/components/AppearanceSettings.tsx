@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -10,9 +11,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 
 export type ButtonStyle = "default" | "outline" | "rounded";
+export type ThemeType = "light" | "dark";
+
 export type AppearanceSettings = {
   buttonStyle: ButtonStyle;
-  theme: "light" | "dark";
+  theme: ThemeType;
 };
 
 type AppearanceSettingsProps = {
@@ -28,8 +31,8 @@ const defaultSettings: AppearanceSettings = {
 interface AppearanceSettingsData {
   id: string;
   user_id: string;
-  button_style: ButtonStyle;
-  theme: "light" | "dark";
+  button_style: string;
+  theme: string;
   created_at: string;
   updated_at: string;
 }
@@ -62,7 +65,7 @@ const AppearanceSettings = ({
         if (data) {
           setSettings({
             buttonStyle: data.button_style as ButtonStyle || defaultSettings.buttonStyle,
-            theme: data.theme || defaultSettings.theme
+            theme: data.theme as ThemeType || defaultSettings.theme
           });
         }
       } catch (error) {
