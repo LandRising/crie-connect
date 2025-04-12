@@ -1,12 +1,17 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, User } from "lucide-react";
+import { ExternalLink, User, Share2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ButtonStyle, ThemeType } from "@/components/AppearanceSettings";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toast } from "@/components/ui/use-toast";
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger 
+} from "@/components/ui/popover";
 
 type ProfileLink = {
   id: string;
@@ -46,7 +51,6 @@ const Profile = () => {
     const fetchProfile = async () => {
       setLoading(true);
       try {
-        // Fetch profile data
         const { data: profileData, error: profileError } = await supabase
           .from("profiles")
           .select("*")
@@ -58,7 +62,6 @@ const Profile = () => {
 
         setProfile(profileData);
 
-        // Fetch links
         const { data: linksData, error: linksError } = await supabase
           .from("links")
           .select("id, title, url")
@@ -69,7 +72,6 @@ const Profile = () => {
         if (linksError) throw linksError;
         setLinks(linksData || []);
         
-        // Fetch appearance settings
         const { data: appearanceData, error: appearanceError } = await supabase
           .from("appearance_settings")
           .select("*")
@@ -125,6 +127,27 @@ const Profile = () => {
     };
   };
 
+  const handleShare = async () => {
+    const url = window.location.href;
+    
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `${profile?.full_name || profile?.username} - CRIE Connect`,
+          text: `Confira o perfil de ${profile?.full_name || profile?.username} no CRIE Connect!`,
+          url: url,
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast({
+          description: "Link copiado para a área de transferência!",
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao compartilhar:", error);
+    }
+  };
+
   const themeStyles = getThemeStyles(appearance.theme);
 
   if (loading) {
@@ -149,7 +172,6 @@ const Profile = () => {
 
   return (
     <div className={cn("min-h-screen flex flex-col items-center", themeStyles.background)}>
-      {/* Cover Image */}
       {profile.cover_url && (
         <div className="w-full h-48 relative">
           <img 
@@ -160,7 +182,42 @@ const Profile = () => {
         </div>
       )}
 
-      <div className="w-full max-w-md px-4 py-12">
+      <div className="w-full max-w-md px-4 py-12 relative">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="absolute right-4 top-4 bg-white/50 backdrop-blur-sm hover:bg-white/70 dark:bg-black/50 dark:hover:bg-black/70 rounded-full"
+            >
+              <Share2 size={18} className={themeStyles.text} />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-2" align="end" alignOffset={0} sideOffset={5}>
+            <div className="flex flex-col gap-1">
+              <Button 
+                variant="ghost" 
+                className="justify-start text-sm" 
+                onClick={handleShare}
+              >
+                Compartilhar perfil
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="justify-start text-sm" 
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast({
+                    description: "Link copiado para a área de transferência!",
+                  });
+                }}
+              >
+                Copiar link
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+        
         <div className="text-center mb-8">
           <Avatar className="h-24 w-24 mx-auto mb-4">
             {profile.avatar_url ? (
