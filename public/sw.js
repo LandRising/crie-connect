@@ -5,7 +5,9 @@ const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icons/icon-512x512.png'
+  '/icons/icon-512x512.png',
+  '/icons/icon-192x192.png',
+  '/icons/maskable_icon.png'
 ];
 
 // Instalação do Service Worker e cache dos recursos principais
@@ -16,6 +18,27 @@ self.addEventListener('install', (event) => {
         console.log('Cache aberto');
         return cache.addAll(urlsToCache);
       })
+  );
+  // Force the waiting service worker to become the active service worker
+  self.skipWaiting();
+});
+
+// Ativar e limpar caches antigos
+self.addEventListener('activate', (event) => {
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => {
+      // Claim clients so the page is controlled immediately
+      return self.clients.claim();
+    })
   );
 });
 
@@ -38,21 +61,5 @@ self.addEventListener('fetch', (event) => {
         // Se a rede falhar, tentamos responder do cache
         return caches.match(event.request);
       })
-  );
-});
-
-// Limpar caches antigos quando o Service Worker é atualizado
-self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
   );
 });
