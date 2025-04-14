@@ -12,6 +12,7 @@ const InstallPWA = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [showInstallButton, setShowInstallButton] = useState(true);
 
   useEffect(() => {
     // Check if already installed
@@ -33,22 +34,27 @@ const InstallPWA = () => {
     };
 
     if (checkInstalled()) {
+      setShowInstallButton(false);
       return;
     }
 
     // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('Before install prompt event fired');
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsInstallable(true);
+      setShowInstallButton(true);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
     // Check if already installed via app install status
     window.addEventListener('appinstalled', () => {
+      console.log('PWA was installed');
       setIsInstalled(true);
       setIsInstallable(false);
+      setShowInstallButton(false);
     });
 
     return () => {
@@ -76,7 +82,11 @@ const InstallPWA = () => {
     setIsInstallable(false);
   };
 
-  if (!isInstallable || isInstalled) return null;
+  // Sempre mostramos o botão em dispositivos móveis a menos que já instalado
+  // ou se detectarmos que é instalável
+  if (!showInstallButton || (isInstalled && !isInstallable)) {
+    return null;
+  }
 
   return (
     <Button

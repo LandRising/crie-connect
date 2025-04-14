@@ -16,4 +16,11 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// Adicionar listener para debugar o PWA
+window.addEventListener('beforeinstallprompt', (e) => {
+  console.log('beforeinstallprompt foi disparado');
+  // Prevenir o comportamento padrão do Chrome
+  e.preventDefault();
+});
+
 createRoot(document.getElementById("root")!).render(<App />);
