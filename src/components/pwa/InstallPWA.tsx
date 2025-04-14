@@ -8,68 +8,77 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
+// Make deferredPrompt available globally
+declare global {
+  interface Window {
+    deferredPrompt: BeforeInstallPromptEvent | null;
+  }
+}
+
 const InstallPWA = () => {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
-  const [showInstallButton, setShowInstallButton] = useState(true);
 
   useEffect(() => {
-    // Check if already installed
-    const checkInstalled = () => {
-      // Check if browser supports display-mode media query
-      if (window.matchMedia('(display-mode: standalone)').matches) {
+    // Check if already installed as PWA
+    const checkInstalledStatus = () => {
+      if (window.matchMedia('(display-mode: standalone)').matches || 
+          (window.navigator as any).standalone === true) {
+        console.log("PWA is already installed");
         setIsInstalled(true);
         return true;
       }
-      
-      // Check for iOS installed PWA
-      // @ts-ignore - Apple specific property
-      if (window.navigator.standalone === true) {
-        setIsInstalled(true);
-        return true;
-      }
-      
       return false;
     };
 
-    if (checkInstalled()) {
-      setShowInstallButton(false);
+    // Check if already installed
+    if (checkInstalledStatus()) {
       return;
+    }
+
+    // Check if install prompt is already available
+    if (window.deferredPrompt) {
+      console.log("Install prompt is already available");
+      setIsInstallable(true);
     }
 
     // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
-      console.log('Before install prompt event fired');
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      console.log('beforeinstallprompt captured in component');
+      // Store the event for later use
+      window.deferredPrompt = e as BeforeInstallPromptEvent;
       setIsInstallable(true);
-      setShowInstallButton(true);
     };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // Check if already installed via app install status
-    window.addEventListener('appinstalled', () => {
+    // Check if installed via app install status
+    const handleAppInstalled = () => {
       console.log('PWA was installed');
       setIsInstalled(true);
       setIsInstallable(false);
-      setShowInstallButton(false);
-    });
+      window.deferredPrompt = null;
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
+    if (!window.deferredPrompt) {
+      console.log("No installation prompt available");
+      return;
+    }
 
     // Show the install prompt
-    await deferredPrompt.prompt();
+    console.log("Showing installation prompt");
+    await window.deferredPrompt.prompt();
     
     // Wait for the user to respond to the prompt
-    const choiceResult = await deferredPrompt.userChoice;
+    const choiceResult = await window.deferredPrompt.userChoice;
     
     if (choiceResult.outcome === 'accepted') {
       console.log('User accepted the install prompt');
@@ -77,17 +86,18 @@ const InstallPWA = () => {
       console.log('User dismissed the install prompt');
     }
     
-    // We've used the prompt, and can't use it again, discard it
-    setDeferredPrompt(null);
+    // Clear the prompt, it can't be used again
+    window.deferredPrompt = null;
     setIsInstallable(false);
   };
 
-  // Sempre mostramos o botão em dispositivos móveis a menos que já instalado
-  // ou se detectarmos que é instalável
-  if (!showInstallButton || (isInstalled && !isInstallable)) {
+  // Don't show the button if it's already installed
+  if (isInstalled) {
     return null;
   }
 
+  // Always show the button on mobile devices, even if we don't think it's installable yet
+  // This helps in cases where the beforeinstallprompt event might not fire correctly
   return (
     <Button
       onClick={handleInstallClick}

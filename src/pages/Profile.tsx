@@ -1,3 +1,4 @@
+
 import { useParams } from "react-router-dom";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileLinks } from "@/components/profile/ProfileLinks";
@@ -14,16 +15,17 @@ const Profile = () => {
   const [showPwaPromo, setShowPwaPromo] = useState(true);
 
   useEffect(() => {
-    setShowPwaPromo(true);
-    
+    // Check if running as PWA
     const isPwa = window.matchMedia('(display-mode: standalone)').matches || 
                  (window.navigator as any).standalone === true;
                  
     if (isPwa) {
+      console.log("Running as PWA, hiding promo");
       setShowPwaPromo(false);
+    } else {
+      console.log("Not running as PWA, showing promo");
+      setShowPwaPromo(true);
     }
-    
-    console.log("PWA status check:", { isPwa, showPwaPromo: !isPwa });
   }, []);
 
   if (loading) {

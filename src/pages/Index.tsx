@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/AuthProvider";
@@ -10,11 +9,19 @@ const Index = () => {
   const { user, isLoading } = useAuth();
   const [showPwaPromo, setShowPwaPromo] = useState(false);
   
-  // Verificar se a aplicação está sendo executada como PWA
+  // Check if the application is running as PWA
   useEffect(() => {
+    // Check if running as PWA
     const isPwa = window.matchMedia('(display-mode: standalone)').matches || 
                  (window.navigator as any).standalone === true;
-    setShowPwaPromo(!isPwa);
+                 
+    if (isPwa) {
+      console.log("Running as PWA, hiding promo");
+      setShowPwaPromo(false);
+    } else {
+      console.log("Not running as PWA, showing promo");
+      setShowPwaPromo(true);
+    }
   }, []);
   
   return (
@@ -90,7 +97,7 @@ const Index = () => {
         </div>
       </div>
       
-      {/* Botão flutuante para instalação do PWA */}
+      {/* Floating button for PWA installation */}
       {showPwaPromo && (
         <div className="fixed bottom-6 right-6 z-50">
           <InstallPWA />
