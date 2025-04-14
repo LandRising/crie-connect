@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -97,5 +98,45 @@
 
   body {
     @apply bg-background text-foreground;
+    height: 100vh; /* Fallback para navegadores que não suportam variáveis CSS */
+    height: calc(var(--vh, 1vh) * 100); /* Use a variável --vh */
+  }
+}
+
+/* Mobile optimization */
+@layer utilities {
+  .min-h-screen-safe {
+    min-height: 100vh;
+    min-height: calc(var(--vh, 1vh) * 100);
+  }
+  
+  .h-screen-safe {
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
+  }
+  
+  .touch-action-none {
+    touch-action: none;
+  }
+  
+  .tap-highlight-transparent {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* PWA related styles */
+@layer components {
+  .pwa-install-button {
+    @apply fixed bottom-4 right-4 z-50 flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground p-4 shadow-lg;
+  }
+}
+
+/* Safe areas for mobile devices */
+@supports(padding: max(0px)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }

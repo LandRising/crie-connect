@@ -10,6 +10,7 @@ import ProfileEditor from "@/components/ProfileEditor";
 import AppearanceSettings from "@/components/AppearanceSettings";
 import { useAppearanceSettings } from "@/hooks/useAppearanceSettings";
 import { useProfile } from "@/hooks/useProfile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -17,6 +18,7 @@ const Dashboard = () => {
   const { username } = useProfile();
   const { appearanceSettings, saveAppearanceSettings } = useAppearanceSettings();
   const [activeTab, setActiveTab] = useState("links");
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!user) {
@@ -25,31 +27,33 @@ const Dashboard = () => {
   }, [user, navigate]);
 
   return (
-    <div className="min-h-screen bg-white p-4 max-w-2xl mx-auto">
-      <DashboardHeader username={username} />
-      
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-        <TabsList className="mb-4 w-full justify-start">
-          <TabsTrigger value="links">Links</TabsTrigger>
-          <TabsTrigger value="profile">Perfil</TabsTrigger>
-          <TabsTrigger value="appearance">Aparência</TabsTrigger>
-        </TabsList>
+    <div className="min-h-screen-safe bg-background p-3 sm:p-4 w-full">
+      <div className="max-w-2xl mx-auto">
+        <DashboardHeader username={username} />
         
-        <TabsContent value="links" className="space-y-6">
-          <LinksManager />
-        </TabsContent>
-        
-        <TabsContent value="profile">
-          <ProfileEditor />
-        </TabsContent>
-        
-        <TabsContent value="appearance">
-          <AppearanceSettings 
-            initialSettings={appearanceSettings || undefined} 
-            onSave={saveAppearanceSettings} 
-          />
-        </TabsContent>
-      </Tabs>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6 sm:mb-8">
+          <TabsList className="mb-4 w-full justify-start overflow-x-auto no-scrollbar">
+            <TabsTrigger value="links" className="flex-shrink-0">Links</TabsTrigger>
+            <TabsTrigger value="profile" className="flex-shrink-0">Perfil</TabsTrigger>
+            <TabsTrigger value="appearance" className="flex-shrink-0">Aparência</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="links" className="space-y-4 sm:space-y-6">
+            <LinksManager />
+          </TabsContent>
+          
+          <TabsContent value="profile">
+            <ProfileEditor />
+          </TabsContent>
+          
+          <TabsContent value="appearance">
+            <AppearanceSettings 
+              initialSettings={appearanceSettings || undefined} 
+              onSave={saveAppearanceSettings} 
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };

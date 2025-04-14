@@ -50,7 +50,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-white p-4">
+    <div className="flex items-center justify-center min-h-screen-safe bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center text-2xl">
@@ -70,6 +70,7 @@ const Auth = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="seu@email.com"
+                className="w-full"
               />
             </div>
             <div className="space-y-2">
@@ -83,6 +84,7 @@ const Auth = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="********"
+                className="w-full"
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>

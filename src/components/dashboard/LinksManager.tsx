@@ -11,7 +11,7 @@ const LinksManager = () => {
   
   useEffect(() => {
     fetchLinks();
-  }, []);
+  }, [fetchLinks]);
 
   return (
     <div className="space-y-6">
@@ -21,7 +21,7 @@ const LinksManager = () => {
         onSubmit={addLink}
       />
       
-      <div>
+      <div className="w-full">
         <h2 className="text-xl font-semibold mb-4">Seus Links</h2>
         <LinkSorter links={links} onUpdate={fetchLinks} />
       </div>
