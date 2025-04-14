@@ -1,28 +1,10 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/AuthProvider";
-import InstallPWA from "@/components/pwa/InstallPWA";
-import { Download } from "lucide-react";
-import { useEffect, useState } from "react";
 
 const Index = () => {
   const { user, isLoading } = useAuth();
-  const [showPwaPromo, setShowPwaPromo] = useState(false);
-  
-  // Check if the application is running as PWA
-  useEffect(() => {
-    // Check if running as PWA
-    const isPwa = window.matchMedia('(display-mode: standalone)').matches || 
-                 (window.navigator as any).standalone === true;
-                 
-    if (isPwa) {
-      console.log("Running as PWA, hiding promo");
-      setShowPwaPromo(false);
-    } else {
-      console.log("Not running as PWA, showing promo");
-      setShowPwaPromo(true);
-    }
-  }, []);
   
   return (
     <div className="min-h-screen-safe flex flex-col items-center justify-center bg-background p-4">
@@ -41,16 +23,6 @@ const Index = () => {
                 Ir para o Dashboard
               </Button>
             </Link>
-            {showPwaPromo && (
-              <div className="mt-4 bg-primary/10 p-4 rounded-lg">
-                <h3 className="font-semibold mb-2 flex items-center justify-center gap-2">
-                  <Download size={18} />
-                  Instale o App
-                </h3>
-                <p className="text-sm mb-3">Instale o CRIE Connect para acesso rápido sem abrir o navegador.</p>
-                <InstallPWA />
-              </div>
-            )}
           </div>
         ) : (
           <div className="space-y-4">
@@ -59,16 +31,6 @@ const Index = () => {
                 Começar agora
               </Button>
             </Link>
-            {showPwaPromo && (
-              <div className="mt-4 bg-primary/10 p-4 rounded-lg">
-                <h3 className="font-semibold mb-2 flex items-center justify-center gap-2">
-                  <Download size={18} />
-                  Instale o App
-                </h3>
-                <p className="text-sm mb-3">Instale o CRIE Connect para acesso rápido sem abrir o navegador.</p>
-                <InstallPWA />
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -96,13 +58,6 @@ const Index = () => {
           </div>
         </div>
       </div>
-      
-      {/* Floating button for PWA installation */}
-      {showPwaPromo && (
-        <div className="fixed bottom-6 right-6 z-50">
-          <InstallPWA />
-        </div>
-      )}
     </div>
   );
 };

@@ -11,6 +11,7 @@ import AppearanceSettings from "@/components/AppearanceSettings";
 import { useAppearanceSettings } from "@/hooks/useAppearanceSettings";
 import { useProfile } from "@/hooks/useProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
+import InstallPWA from "@/components/pwa/InstallPWA";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -53,6 +54,11 @@ const Dashboard = () => {
             />
           </TabsContent>
         </Tabs>
+        
+        {/* Botão de instalação PWA apenas para usuários autenticados */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <InstallPWA />
+        </div>
       </div>
     </div>
   );

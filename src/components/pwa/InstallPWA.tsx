@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
+import { useAuth } from '@/components/AuthProvider';
+import { toast } from '@/components/ui/use-toast';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -18,6 +20,7 @@ declare global {
 const InstallPWA = () => {
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     // Check if already installed as PWA
@@ -45,6 +48,8 @@ const InstallPWA = () => {
     // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
       console.log('beforeinstallprompt captured in component');
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault();
       // Store the event for later use
       window.deferredPrompt = e as BeforeInstallPromptEvent;
       setIsInstallable(true);
@@ -56,6 +61,10 @@ const InstallPWA = () => {
       setIsInstalled(true);
       setIsInstallable(false);
       window.deferredPrompt = null;
+      toast({
+        title: "Instalação concluída",
+        description: "O aplicativo foi instalado com sucesso!",
+      });
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -70,40 +79,61 @@ const InstallPWA = () => {
   const handleInstallClick = async () => {
     if (!window.deferredPrompt) {
       console.log("No installation prompt available");
+      toast({
+        title: "Instalação não disponível",
+        description: "Seu navegador não suporta ou já tem o app instalado.",
+        variant: "destructive",
+      });
       return;
     }
 
     // Show the install prompt
     console.log("Showing installation prompt");
-    await window.deferredPrompt.prompt();
-    
-    // Wait for the user to respond to the prompt
-    const choiceResult = await window.deferredPrompt.userChoice;
-    
-    if (choiceResult.outcome === 'accepted') {
-      console.log('User accepted the install prompt');
-    } else {
-      console.log('User dismissed the install prompt');
+    try {
+      await window.deferredPrompt.prompt();
+      
+      // Wait for the user to respond to the prompt
+      const choiceResult = await window.deferredPrompt.userChoice;
+      
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+        toast({
+          title: "Instalação iniciada",
+          description: "O aplicativo está sendo instalado.",
+        });
+      } else {
+        console.log('User dismissed the install prompt');
+        toast({
+          title: "Instalação cancelada",
+          description: "Você cancelou a instalação do aplicativo.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Installation error:', error);
+      toast({
+        title: "Erro na instalação",
+        description: "Ocorreu um erro ao tentar instalar o aplicativo.",
+        variant: "destructive",
+      });
+    } finally {
+      // Clear the prompt, it can't be used again
+      window.deferredPrompt = null;
+      setIsInstallable(false);
     }
-    
-    // Clear the prompt, it can't be used again
-    window.deferredPrompt = null;
-    setIsInstallable(false);
   };
 
-  // Don't show the button if it's already installed
-  if (isInstalled) {
+  // Don't show the button if it's already installed or if user is not logged in
+  if (isInstalled || !user) {
     return null;
   }
 
-  // Always show the button on mobile devices, even if we don't think it's installable yet
-  // This helps in cases where the beforeinstallprompt event might not fire correctly
   return (
     <Button
       onClick={handleInstallClick}
       variant="default"
       size="sm"
-      className="shadow-lg animate-pulse"
+      className="shadow-lg"
     >
       <Download className="mr-2 h-4 w-4" />
       Instalar App
