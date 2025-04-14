@@ -2,11 +2,10 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
-import { toast } from 'sonner';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
 const InstallPWA = () => {
@@ -15,37 +14,41 @@ const InstallPWA = () => {
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
+    // Check if already installed
+    const checkInstalled = () => {
+      // Check if browser supports display-mode media query
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        setIsInstalled(true);
+        return true;
+      }
+      
+      // Check for iOS installed PWA
+      // @ts-ignore - Apple specific property
+      if (window.navigator.standalone === true) {
+        setIsInstalled(true);
+        return true;
+      }
+      
+      return false;
+    };
+
+    if (checkInstalled()) {
+      return;
+    }
+
+    // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
-      // Impede que o mini-infobar apareça em mobile
       e.preventDefault();
-      // Armazena o evento para que possa ser acionado mais tarde
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      // Atualiza UI para notificar que o app pode ser instalado
       setIsInstallable(true);
-      console.log('O app pode ser instalado!');
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // Verifica se o app já está instalado
-    const checkAppInstalled = () => {
-      if (window.matchMedia('(display-mode: standalone)').matches || 
-          window.navigator.standalone === true) {
-        setIsInstalled(true);
-        setIsInstallable(false);
-        console.log('A aplicação já está instalada');
-      }
-    };
-    
-    checkAppInstalled();
-    
-    // Monitorar quando o app for instalado
+    // Check if already installed via app install status
     window.addEventListener('appinstalled', () => {
-      setIsInstallable(false);
       setIsInstalled(true);
-      setDeferredPrompt(null);
-      toast.success('CRIE Connect foi instalado com sucesso!');
-      console.log('PWA instalado com sucesso!');
+      setIsInstallable(false);
     });
 
     return () => {
@@ -54,46 +57,37 @@ const InstallPWA = () => {
   }, []);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) {
-      // Se não tiver o evento armazenado, mostra instruções alternativas
-      toast.info('Instale nosso app através do menu do seu navegador');
-      return;
-    }
+    if (!deferredPrompt) return;
 
-    // Mostra o prompt de instalação
+    // Show the install prompt
     await deferredPrompt.prompt();
-
-    // Aguarda o usuário responder ao prompt
+    
+    // Wait for the user to respond to the prompt
     const choiceResult = await deferredPrompt.userChoice;
-
+    
     if (choiceResult.outcome === 'accepted') {
-      console.log('Usuário aceitou a instalação do PWA');
-      toast.success('Instalação iniciada!');
+      console.log('User accepted the install prompt');
     } else {
-      console.log('Usuário recusou a instalação do PWA');
-      toast.info('Você pode instalar o app mais tarde pelo menu do navegador');
+      console.log('User dismissed the install prompt');
     }
-
+    
+    // We've used the prompt, and can't use it again, discard it
     setDeferredPrompt(null);
+    setIsInstallable(false);
   };
 
-  if (isInstalled) {
-    return null; // Não mostra nada se já estiver instalado
-  }
+  if (!isInstallable || isInstalled) return null;
 
   return (
-    <>
-      {isInstallable && (
-        <Button 
-          onClick={handleInstallClick}
-          className="flex items-center gap-2"
-          variant="outline"
-        >
-          <Download size={16} />
-          Instalar App
-        </Button>
-      )}
-    </>
+    <Button
+      onClick={handleInstallClick}
+      variant="default"
+      size="sm"
+      className="shadow-lg animate-pulse"
+    >
+      <Download className="mr-2 h-4 w-4" />
+      Instalar App
+    </Button>
   );
 };
 
