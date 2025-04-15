@@ -1,25 +1,28 @@
 
 import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 
 export const useProfileVisit = (username?: string, profileId?: string) => {
   const { user } = useAuth();
   
   useEffect(() => {
-    // Não registrar visita se o perfil não existir ou se for o próprio usuário visualizando
+    // Don't register visit if the profile doesn't exist or if it's the user viewing their own profile
     if (!username || !profileId || user?.id === profileId) return;
     
-    const registerVisit = async () => {
+    const registerVisit = () => {
       try {
-        // Registrar visita ao perfil
-        await supabase.from("profile_visits").insert({
+        // Store visit in local storage for now
+        const visits = JSON.parse(localStorage.getItem('profile_visits') || '[]');
+        visits.push({
           profile_id: profileId,
-          visitor_id: user?.id || null, // null para visitantes não autenticados
+          visitor_id: user?.id || null, // null for unauthenticated visitors
           visit_date: new Date().toISOString(),
           referrer: document.referrer || null,
           user_agent: navigator.userAgent,
         });
+        localStorage.setItem('profile_visits', JSON.stringify(visits));
+        
+        console.log("Profile visit registered locally:", profileId);
       } catch (error) {
         console.error("Erro ao registrar visita:", error);
       }

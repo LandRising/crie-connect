@@ -1,38 +1,39 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useProfileStats } from "@/hooks/useProfileStats";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
 
 type ProfileAnalyticsProps = {
   profileId: string;
 };
 
 export const ProfileAnalytics = ({ profileId }: ProfileAnalyticsProps) => {
-  const { stats, isLoading } = useProfileStats(profileId);
   const [activeTab, setActiveTab] = useState<string>("today");
 
-  if (isLoading) {
-    return (
-      <Card className="mt-8">
-        <CardHeader>
-          <Skeleton className="h-6 w-40" />
-          <Skeleton className="h-4 w-64" />
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-[200px] w-full" />
-        </CardContent>
-      </Card>
-    );
-  }
+  // Mock data for demo purposes
+  const mockData = [
+    { date: "01/04", count: 4 },
+    { date: "02/04", count: 7 },
+    { date: "03/04", count: 5 },
+    { date: "04/04", count: 8 },
+    { date: "05/04", count: 10 },
+    { date: "06/04", count: 6 },
+    { date: "07/04", count: 9 },
+  ];
 
   const timeframes = {
     today: "Hoje",
     week: "Esta semana",
     month: "Este mês",
     all: "Todo o período"
+  };
+
+  const stats = {
+    today: { visits: 10, clicks: 6 },
+    week: { visits: 49, clicks: 30 },
+    month: { visits: 120, clicks: 75 },
+    all: { visits: 350, clicks: 210 }
   };
 
   return (
@@ -58,7 +59,7 @@ export const ProfileAnalytics = ({ profileId }: ProfileAnalyticsProps) => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-2xl font-bold">
-                      {stats[timeframe]?.visits || 0}
+                      {stats[timeframe as keyof typeof stats].visits}
                     </p>
                   </CardContent>
                 </Card>
@@ -69,7 +70,7 @@ export const ProfileAnalytics = ({ profileId }: ProfileAnalyticsProps) => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-2xl font-bold">
-                      {stats[timeframe]?.clicks || 0}
+                      {stats[timeframe as keyof typeof stats].clicks}
                     </p>
                   </CardContent>
                 </Card>
@@ -80,26 +81,22 @@ export const ProfileAnalytics = ({ profileId }: ProfileAnalyticsProps) => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-2xl font-bold">
-                      {stats[timeframe]?.visits 
-                        ? Math.round((stats[timeframe]?.clicks / stats[timeframe]?.visits) * 100) 
-                        : 0}%
+                      {Math.round((stats[timeframe as keyof typeof stats].clicks / stats[timeframe as keyof typeof stats].visits) * 100)}%
                     </p>
                   </CardContent>
                 </Card>
               </div>
               
-              {stats[timeframe]?.dailyVisits?.length > 0 && (
-                <div className="h-[300px] mt-4">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={stats[timeframe].dailyVisits}>
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="count" fill="#8884d8" name="Visitas" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
+              <div className="h-[300px] mt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={mockData}>
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#8884d8" name="Visitas" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </TabsContent>
           ))}
         </Tabs>

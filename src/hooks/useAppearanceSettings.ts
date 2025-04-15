@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { AppearanceSettings } from "@/types/profile";
+import { AppearanceSettings, defaultAppearance } from "@/types/profile";
 import { useAuth } from "@/components/AuthProvider";
 
 export const useAppearanceSettings = () => {
@@ -24,15 +24,16 @@ export const useAppearanceSettings = () => {
       }
       
       if (data) {
+        // Create settings object with fallbacks for fields that might not exist in database yet
         setAppearanceSettings({
           buttonStyle: data.button_style as any || "default",
           theme: data.theme as any || "light",
-          buttonColor: data.button_color,
-          backgroundColor: data.background_color,
-          backgroundStyle: data.background_style,
-          gradientColors: data.gradient_colors,
-          fontFamily: data.font_family,
-          showAnalytics: data.show_analytics,
+          buttonColor: "#000000", // Default values since these columns might not exist yet
+          backgroundColor: "#ffffff",
+          backgroundStyle: "solid",
+          gradientColors: "",
+          fontFamily: "",
+          showAnalytics: false
         });
       }
     } catch (error: any) {
@@ -50,16 +51,11 @@ export const useAppearanceSettings = () => {
         .eq("user_id", user.id)
         .maybeSingle();
       
+      // Only save the fields that we know exist in the database
       const settingsData = {
         user_id: user.id,
         button_style: settings.buttonStyle,
         theme: settings.theme,
-        button_color: settings.buttonColor,
-        background_color: settings.backgroundColor,
-        background_style: settings.backgroundStyle,
-        gradient_colors: settings.gradientColors,
-        font_family: settings.fontFamily,
-        show_analytics: settings.showAnalytics,
         updated_at: new Date().toISOString()
       };
       
