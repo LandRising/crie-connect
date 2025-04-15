@@ -22,8 +22,14 @@ export type AppearanceSettings = {
   buttonColor?: string;
   backgroundColor?: string;
   backgroundStyle?: BackgroundStyle;
+  backgroundImage?: string;
   gradientColors?: string;
   fontFamily?: string;
+  customFontUrl?: string;
+  iconStyle?: string;
+  customIcons?: Record<string, string>;
+  layoutTemplate?: string;
+  layoutSettings?: Record<string, any>;
   showAnalytics?: boolean;
 };
 
@@ -34,4 +40,5 @@ export const defaultAppearance: AppearanceSettings = {
   buttonColor: "#000000",
   backgroundColor: "#ffffff",
   backgroundStyle: "solid",
+  layoutTemplate: "standard",
 };

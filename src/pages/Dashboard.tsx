@@ -3,8 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import LinksManager from "@/components/dashboard/LinksManager";
-import ProfileEditor from "@/components/ProfileEditor";
-import AppearanceSettings from "@/components/AppearanceSettings";
+import ProfileAndAppearance from "@/components/profile/editor/ProfileAndAppearance";
 import { useAppearanceSettings } from "@/hooks/useAppearanceSettings";
 import { useProfile } from "@/hooks/useProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -38,10 +37,7 @@ const Dashboard = () => {
               <Link size={16} /> Links
             </TabsTrigger>
             <TabsTrigger value="profile" className="flex-shrink-0 flex items-center gap-2">
-              <User size={16} /> Perfil
-            </TabsTrigger>
-            <TabsTrigger value="appearance" className="flex-shrink-0 flex items-center gap-2">
-              <Palette size={16} /> Aparência
+              <User size={16} /> Perfil e Aparência
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex-shrink-0 flex items-center gap-2">
               <BarChart3 size={16} /> Analytics
@@ -53,14 +49,7 @@ const Dashboard = () => {
           </TabsContent>
           
           <TabsContent value="profile">
-            <ProfileEditor />
-          </TabsContent>
-          
-          <TabsContent value="appearance">
-            <AppearanceSettings 
-              initialSettings={appearanceSettings || undefined} 
-              onSave={saveAppearanceSettings} 
-            />
+            <ProfileAndAppearance />
           </TabsContent>
           
           <TabsContent value="analytics">
