@@ -1,5 +1,5 @@
 
-import { ButtonStyle, ThemeType } from "@/components/AppearanceSettings";
+import { ButtonStyle, ThemeType, BackgroundStyle } from "@/components/AppearanceSettings";
 
 export type ProfileLink = {
   id: string;
@@ -21,7 +21,7 @@ export type AppearanceSettings = {
   theme: ThemeType;
   buttonColor?: string;
   backgroundColor?: string;
-  backgroundStyle?: string;
+  backgroundStyle?: BackgroundStyle;
   gradientColors?: string;
   fontFamily?: string;
   showAnalytics?: boolean;

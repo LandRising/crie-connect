@@ -11,10 +11,14 @@ import { ProfileData } from "@/types/profile";
 
 type ShareButtonProps = {
   profile: ProfileData;
-  themeTextColor: string;
+  themeStyles: {
+    text: string;
+    subtext: string;
+    background?: string;
+  };
 };
 
-export const ShareButton = ({ profile, themeTextColor }: ShareButtonProps) => {
+export const ShareButton = ({ profile, themeStyles }: ShareButtonProps) => {
   const handleShare = async () => {
     const url = window.location.href;
     
@@ -44,7 +48,7 @@ export const ShareButton = ({ profile, themeTextColor }: ShareButtonProps) => {
           size="icon" 
           className="absolute right-4 top-4 bg-white/50 backdrop-blur-sm hover:bg-white/70 dark:bg-black/50 dark:hover:bg-black/70 rounded-full"
         >
-          <Share2 size={18} className={themeTextColor} />
+          <Share2 size={18} className={themeStyles.text} />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-2" align="end" alignOffset={0} sideOffset={5}>
