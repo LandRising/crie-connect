@@ -5,6 +5,7 @@ import { ProfileLinks } from "@/components/profile/ProfileLinks";
 import { ProfileCover } from "@/components/profile/ProfileCover";
 import { useProfileData } from "@/hooks/useProfileData";
 import { getButtonStyles } from "@/utils/profileStyles";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Profile = () => {
   const { username } = useParams<{ username: string }>();
@@ -12,8 +13,22 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">Carregando...</div>
+      <div className="min-h-screen bg-background">
+        <div className="h-40 bg-muted animate-pulse" />
+        <div className="relative z-10 mx-auto max-w-3xl px-4 pb-20 pt-4">
+          <div className="flex items-center mb-8">
+            <Skeleton className="h-20 w-20 rounded-full" />
+            <div className="ml-4 space-y-2">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+          </div>
+          <div className="space-y-3">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-md" />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -21,7 +36,10 @@ const Profile = () => {
   if (error || !profile) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="text-center">Perfil não encontrado</div>
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Perfil não encontrado</h2>
+          <p className="text-muted-foreground">O usuário que você procura não existe ou está indisponível.</p>
+        </div>
       </div>
     );
   }
