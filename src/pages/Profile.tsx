@@ -15,7 +15,7 @@ const Profile = () => {
   // Definir o título da página com base no perfil
   useEffect(() => {
     if (profile) {
-      document.title = `${profile.name || profile.username} | Crie Connect`;
+      document.title = `${profile.full_name || profile.username} | Crie Connect`;
     } else {
       document.title = "Perfil | Crie Connect";
     }
