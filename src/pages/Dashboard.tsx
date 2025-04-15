@@ -1,9 +1,6 @@
 
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/components/AuthProvider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import LinksManager from "@/components/dashboard/LinksManager";
 import ProfileEditor from "@/components/ProfileEditor";
@@ -12,20 +9,21 @@ import { useAppearanceSettings } from "@/hooks/useAppearanceSettings";
 import { useProfile } from "@/hooks/useProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
 import InstallPWA from "@/components/pwa/InstallPWA";
+import { useAutoRedirect } from "@/hooks/useAutoRedirect";
 
 const Dashboard = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+  // Certificar que o usuário está autenticado
+  useAutoRedirect(undefined, "/auth");
+  
   const { username } = useProfile();
   const { appearanceSettings, saveAppearanceSettings } = useAppearanceSettings();
   const [activeTab, setActiveTab] = useState("links");
   const isMobile = useIsMobile();
 
+  // Definir o título da página
   useEffect(() => {
-    if (!user) {
-      navigate("/auth");
-    }
-  }, [user, navigate]);
+    document.title = "Dashboard | Crie Connect";
+  }, []);
 
   return (
     <div className="min-h-screen-safe bg-background p-3 sm:p-4 w-full">

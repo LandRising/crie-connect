@@ -6,10 +6,20 @@ import { ProfileCover } from "@/components/profile/ProfileCover";
 import { useProfileData } from "@/hooks/useProfileData";
 import { getButtonStyles } from "@/utils/profileStyles";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect } from "react";
 
 const Profile = () => {
   const { username } = useParams<{ username: string }>();
   const { profile, links, loading, error, appearance } = useProfileData(username || "");
+
+  // Definir o título da página com base no perfil
+  useEffect(() => {
+    if (profile) {
+      document.title = `${profile.name || profile.username} | Crie Connect`;
+    } else {
+      document.title = "Perfil | Crie Connect";
+    }
+  }, [profile]);
 
   if (loading) {
     return (

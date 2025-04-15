@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,9 @@ import { toast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail, Lock, AlertTriangle, User, Check } from "lucide-react";
+import { useAutoRedirect } from "@/hooks/useAutoRedirect";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -16,7 +18,31 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"login" | "signup" | "reset">("login");
   const [resetSent, setResetSent] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState<"weak" | "medium" | "strong" | null>(null);
   const navigate = useNavigate();
+  
+  // Redirecionar se já estiver autenticado
+  useAutoRedirect("/dashboard");
+
+  // Validar força da senha
+  useEffect(() => {
+    if (!password) {
+      setPasswordStrength(null);
+      return;
+    }
+    
+    const hasLetters = /[a-z]/i.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    if (password.length < 6) {
+      setPasswordStrength("weak");
+    } else if (hasLetters && hasNumbers && hasSpecial && password.length >= 8) {
+      setPasswordStrength("strong");
+    } else {
+      setPasswordStrength("medium");
+    }
+  }, [password]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,6 +136,39 @@ const Auth = () => {
     }
   };
 
+  const getPasswordStrengthColor = () => {
+    switch (passwordStrength) {
+      case "weak": return "bg-red-500";
+      case "medium": return "bg-yellow-500";
+      case "strong": return "bg-green-500";
+      default: return "bg-gray-200";
+    }
+  };
+
+  const getPasswordFeedback = () => {
+    switch (passwordStrength) {
+      case "weak": return (
+        <div className="flex items-center text-xs text-red-500 mt-1 gap-1">
+          <AlertTriangle size={12} />
+          <span>Senha fraca - use pelo menos 6 caracteres</span>
+        </div>
+      );
+      case "medium": return (
+        <div className="flex items-center text-xs text-yellow-500 mt-1 gap-1">
+          <AlertTriangle size={12} />
+          <span>Senha média - adicione caracteres especiais</span>
+        </div>
+      );
+      case "strong": return (
+        <div className="flex items-center text-xs text-green-500 mt-1 gap-1">
+          <Check size={12} />
+          <span>Senha forte</span>
+        </div>
+      );
+      default: return null;
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen-safe bg-background p-4">
       <Card className="w-full max-w-md">
@@ -141,29 +200,35 @@ const Auth = () => {
                   <label htmlFor="email" className="text-sm font-medium">
                     Email
                   </label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    placeholder="seu@email.com"
-                    className="w-full"
-                  />
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      placeholder="seu@email.com"
+                      className="pl-9 w-full"
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="password" className="text-sm font-medium">
                     Senha
                   </label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    placeholder="********"
-                    className="w-full"
-                  />
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      placeholder="********"
+                      className="pl-9 w-full"
+                    />
+                  </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
@@ -206,33 +271,48 @@ const Auth = () => {
                   <label htmlFor="signup-email" className="text-sm font-medium">
                     Email
                   </label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    placeholder="seu@email.com"
-                    className="w-full"
-                  />
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      placeholder="seu@email.com"
+                      className="pl-9 w-full"
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="signup-password" className="text-sm font-medium">
                     Senha
                   </label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    placeholder="********"
-                    className="w-full"
-                    minLength={6}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    A senha deve ter pelo menos 6 caracteres
-                  </p>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="signup-password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      placeholder="********"
+                      className="pl-9 w-full"
+                      minLength={6}
+                    />
+                  </div>
+                  
+                  {/* Indicador de força da senha */}
+                  {password && (
+                    <>
+                      <div className="h-1 w-full bg-gray-200 rounded-full mt-2">
+                        <div className={`h-1 rounded-full ${getPasswordStrengthColor()}`} style={{
+                          width: passwordStrength === "weak" ? "33%" : passwordStrength === "medium" ? "66%" : "100%"
+                        }} />
+                      </div>
+                      {getPasswordFeedback()}
+                    </>
+                  )}
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
@@ -292,15 +372,18 @@ const Auth = () => {
                     <label htmlFor="reset-email" className="text-sm font-medium">
                       Email
                     </label>
-                    <Input
-                      id="reset-email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      placeholder="seu@email.com"
-                      className="w-full"
-                    />
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="reset-email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        placeholder="seu@email.com"
+                        className="pl-9 w-full"
+                      />
+                    </div>
                     <p className="text-xs text-muted-foreground">
                       Enviaremos instruções para redefinir sua senha.
                     </p>
@@ -320,6 +403,50 @@ const Auth = () => {
             </TabsContent>
           </Tabs>
         </CardContent>
+        
+        <CardFooter className="flex justify-center">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="link" size="sm" className="text-xs">
+                Precisa de ajuda?
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Suporte</SheetTitle>
+                <SheetDescription>
+                  Como podemos ajudar você com o acesso à sua conta?
+                </SheetDescription>
+              </SheetHeader>
+              <div className="space-y-4 mt-6">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Não consigo fazer login</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Verifique se você está usando o email correto e se digitou a senha corretamente. Caso não lembre sua senha, use a opção "Recuperar" para redefiní-la.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Não recebi o email de recuperação</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Verifique sua pasta de spam ou lixo eletrônico. O email pode levar alguns minutos para chegar.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Problemas com login via Google</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Certifique-se de permitir os pop-ups no seu navegador e tente novamente.
+                  </p>
+                </div>
+                <div className="space-y-2 mt-6">
+                  <p className="text-sm text-muted-foreground">
+                    Para outras dúvidas, entre em contato com o suporte pelo email:
+                    <a href="mailto:suporte@exemplo.com" className="text-primary ml-1">suporte@exemplo.com</a>
+                  </p>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </CardFooter>
       </Card>
     </div>
   );

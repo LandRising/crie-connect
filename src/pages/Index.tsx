@@ -2,9 +2,15 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/AuthProvider";
+import { useEffect } from "react";
 
 const Index = () => {
   const { user, isLoading } = useAuth();
+  
+  // Definir o título da página
+  useEffect(() => {
+    document.title = "Crie Connect - Compartilhe seus links em um só lugar";
+  }, []);
   
   return (
     <div className="min-h-screen-safe flex flex-col items-center justify-center bg-background p-4">
