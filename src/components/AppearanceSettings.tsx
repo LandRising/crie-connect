@@ -45,8 +45,9 @@ const defaultSettings: AppearanceSettings = {
   showAnalytics: false,
 };
 
+// Updated fontOptions with "default" as the value instead of an empty string
 const fontOptions = [
-  { value: "", label: "Padrão" },
+  { value: "default", label: "Padrão" },
   { value: "Roboto", label: "Roboto" },
   { value: "Open Sans", label: "Open Sans" },
   { value: "Montserrat", label: "Montserrat" },
@@ -132,7 +133,7 @@ const AppearanceSettings = ({
         background_color: settings.backgroundColor,
         background_style: settings.backgroundStyle,
         gradient_colors: settings.gradientColors,
-        font_family: settings.fontFamily,
+        font_family: settings.fontFamily === "default" ? "" : settings.fontFamily, // Convert "default" to empty string for storage
         show_analytics: settings.showAnalytics,
         updated_at: new Date().toISOString()
       };
@@ -380,7 +381,7 @@ const AppearanceSettings = ({
                   Fonte
                 </Label>
                 <Select
-                  value={settings.fontFamily}
+                  value={settings.fontFamily || "default"} // Use "default" when fontFamily is empty
                   onValueChange={(value) => setSettings({ ...settings, fontFamily: value })}
                 >
                   <SelectTrigger>
@@ -391,7 +392,7 @@ const AppearanceSettings = ({
                       <SelectItem 
                         key={font.value} 
                         value={font.value}
-                        style={{ fontFamily: font.value ? `${font.value}, sans-serif` : undefined }}
+                        style={{ fontFamily: font.value !== "default" ? `${font.value}, sans-serif` : undefined }}
                       >
                         {font.label}
                       </SelectItem>
@@ -400,7 +401,7 @@ const AppearanceSettings = ({
                 </Select>
               </div>
               
-              {settings.fontFamily && (
+              {settings.fontFamily && settings.fontFamily !== "default" && (
                 <div className="p-4 border rounded-md">
                   <p className="text-lg font-medium mb-2" style={{ fontFamily: `${settings.fontFamily}, sans-serif` }}>
                     Visualização da fonte {settings.fontFamily}
