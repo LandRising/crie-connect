@@ -10,6 +10,8 @@ import { useProfile } from "@/hooks/useProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
 import InstallPWA from "@/components/pwa/InstallPWA";
 import { useAutoRedirect } from "@/hooks/useAutoRedirect";
+import DashboardAnalytics from "@/components/analytics/DashboardAnalytics";
+import { BarChart3, Link, Palette, User } from "lucide-react";
 
 const Dashboard = () => {
   // Certificar que o usuário está autenticado
@@ -32,9 +34,18 @@ const Dashboard = () => {
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6 sm:mb-8">
           <TabsList className="mb-4 w-full justify-start overflow-x-auto no-scrollbar">
-            <TabsTrigger value="links" className="flex-shrink-0">Links</TabsTrigger>
-            <TabsTrigger value="profile" className="flex-shrink-0">Perfil</TabsTrigger>
-            <TabsTrigger value="appearance" className="flex-shrink-0">Aparência</TabsTrigger>
+            <TabsTrigger value="links" className="flex-shrink-0 flex items-center gap-2">
+              <Link size={16} /> Links
+            </TabsTrigger>
+            <TabsTrigger value="profile" className="flex-shrink-0 flex items-center gap-2">
+              <User size={16} /> Perfil
+            </TabsTrigger>
+            <TabsTrigger value="appearance" className="flex-shrink-0 flex items-center gap-2">
+              <Palette size={16} /> Aparência
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex-shrink-0 flex items-center gap-2">
+              <BarChart3 size={16} /> Analytics
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="links" className="space-y-4 sm:space-y-6">
@@ -50,6 +61,10 @@ const Dashboard = () => {
               initialSettings={appearanceSettings || undefined} 
               onSave={saveAppearanceSettings} 
             />
+          </TabsContent>
+          
+          <TabsContent value="analytics">
+            <DashboardAnalytics />
           </TabsContent>
         </Tabs>
         

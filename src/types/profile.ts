@@ -1,4 +1,6 @@
 
+import { ButtonStyle, ThemeType } from "@/components/AppearanceSettings";
+
 export type ProfileLink = {
   id: string;
   title: string;
@@ -17,12 +19,19 @@ export type ProfileData = {
 export type AppearanceSettings = {
   buttonStyle: ButtonStyle;
   theme: ThemeType;
+  buttonColor?: string;
+  backgroundColor?: string;
+  backgroundStyle?: string;
+  gradientColors?: string;
+  fontFamily?: string;
+  showAnalytics?: boolean;
 };
-
-import { ButtonStyle, ThemeType } from "@/components/AppearanceSettings";
 
 // Default appearance settings
 export const defaultAppearance: AppearanceSettings = {
   buttonStyle: "default",
   theme: "light",
+  buttonColor: "#000000",
+  backgroundColor: "#ffffff",
+  backgroundStyle: "solid",
 };
