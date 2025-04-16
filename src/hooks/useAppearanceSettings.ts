@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppearanceSettings, defaultAppearance } from "@/types/profile";
 import { useAuth } from "@/components/AuthProvider";
+import { ButtonStyle, ThemeType, BackgroundStyle } from "@/components/AppearanceSettings";
 
 export const useAppearanceSettings = () => {
   const { user } = useAuth();
@@ -28,19 +29,19 @@ export const useAppearanceSettings = () => {
       if (data) {
         // Create settings object with fallbacks for fields that might not exist in database yet
         setAppearanceSettings({
-          buttonStyle: data.button_style || "default",
-          theme: data.theme || "light",
-          buttonColor: data.button_color || "#000000",
-          backgroundColor: data.background_color || "#ffffff",
-          backgroundStyle: data.background_style || "solid",
-          backgroundImage: data.background_image || "",  // Handle as empty string if not in DB
+          buttonStyle: data.button_style as ButtonStyle || defaultAppearance.buttonStyle,
+          theme: data.theme as ThemeType || defaultAppearance.theme,
+          buttonColor: data.button_color || defaultAppearance.buttonColor,
+          backgroundColor: data.background_color || defaultAppearance.backgroundColor,
+          backgroundStyle: data.background_style as BackgroundStyle || defaultAppearance.backgroundStyle,
+          backgroundImage: data.background_image as string || "", 
           gradientColors: data.gradient_colors || "",
           fontFamily: data.font_family || "default",
-          customFontUrl: data.custom_font_url || "",     // Handle as empty string if not in DB
-          iconStyle: data.icon_style || "",             // Handle as empty string if not in DB
-          customIcons: data.custom_icons || {},         // Handle as empty object if not in DB
-          layoutTemplate: data.layout_template || "standard", // Handle as default if not in DB
-          layoutSettings: data.layout_settings || {},   // Handle as empty object if not in DB
+          customFontUrl: data.custom_font_url as string || "",
+          iconStyle: data.icon_style as string || "",
+          customIcons: data.custom_icons as Record<string, string> || {},
+          layoutTemplate: data.layout_template as string || "standard",
+          layoutSettings: data.layout_settings as Record<string, any> || {},
           showAnalytics: data.show_analytics || false
         });
       } else {
