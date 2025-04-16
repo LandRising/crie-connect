@@ -12,13 +12,19 @@ export type Database = {
       appearance_settings: {
         Row: {
           background_color: string | null
+          background_image: string | null
           background_style: string | null
           button_color: string | null
           button_style: string
           created_at: string | null
+          custom_font_url: string | null
+          custom_icons: Json | null
           font_family: string | null
           gradient_colors: string | null
+          icon_style: string | null
           id: string
+          layout_settings: Json | null
+          layout_template: string | null
           show_analytics: boolean | null
           theme: string
           updated_at: string | null
@@ -26,13 +32,19 @@ export type Database = {
         }
         Insert: {
           background_color?: string | null
+          background_image?: string | null
           background_style?: string | null
           button_color?: string | null
           button_style?: string
           created_at?: string | null
+          custom_font_url?: string | null
+          custom_icons?: Json | null
           font_family?: string | null
           gradient_colors?: string | null
+          icon_style?: string | null
           id?: string
+          layout_settings?: Json | null
+          layout_template?: string | null
           show_analytics?: boolean | null
           theme?: string
           updated_at?: string | null
@@ -40,13 +52,19 @@ export type Database = {
         }
         Update: {
           background_color?: string | null
+          background_image?: string | null
           background_style?: string | null
           button_color?: string | null
           button_style?: string
           created_at?: string | null
+          custom_font_url?: string | null
+          custom_icons?: Json | null
           font_family?: string | null
           gradient_colors?: string | null
+          icon_style?: string | null
           id?: string
+          layout_settings?: Json | null
+          layout_template?: string | null
           show_analytics?: boolean | null
           theme?: string
           updated_at?: string | null

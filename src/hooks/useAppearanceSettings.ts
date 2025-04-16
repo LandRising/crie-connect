@@ -34,14 +34,14 @@ export const useAppearanceSettings = () => {
           buttonColor: data.button_color || defaultAppearance.buttonColor,
           backgroundColor: data.background_color || defaultAppearance.backgroundColor,
           backgroundStyle: data.background_style as BackgroundStyle || defaultAppearance.backgroundStyle,
-          backgroundImage: data.background_image as string || "", 
+          backgroundImage: data.background_image || "", 
           gradientColors: data.gradient_colors || "",
           fontFamily: data.font_family || "default",
-          customFontUrl: data.custom_font_url as string || "",
-          iconStyle: data.icon_style as string || "",
-          customIcons: data.custom_icons as Record<string, string> || {},
-          layoutTemplate: data.layout_template as string || "standard",
-          layoutSettings: data.layout_settings as Record<string, any> || {},
+          customFontUrl: data.custom_font_url || "",
+          iconStyle: data.icon_style || "",
+          customIcons: data.custom_icons || {},
+          layoutTemplate: data.layout_template || "standard",
+          layoutSettings: data.layout_settings || {},
           showAnalytics: data.show_analytics || false
         });
       } else {
