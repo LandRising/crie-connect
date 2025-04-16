@@ -15,7 +15,7 @@ interface TypographyProps {
   onSettingsChange: (settings: AppearanceSettings) => void;
 }
 
-// Available font options
+// Available font options with font families that are web-safe or common Google Fonts
 const fontOptions = [
   { value: "default", label: "Padrão" },
   { value: "Roboto", label: "Roboto" },
@@ -30,6 +30,18 @@ const fontOptions = [
   { value: "Raleway", label: "Raleway" },
 ];
 
+// Dynamically load Google Fonts when selected
+const loadGoogleFont = (fontFamily: string) => {
+  if (fontFamily === 'default' || document.querySelector(`link[href*="${fontFamily}"]`)) {
+    return;
+  }
+  
+  const link = document.createElement('link');
+  link.href = `https://fonts.googleapis.com/css2?family=${fontFamily.replace(' ', '+')}:wght@400;600;700&display=swap`;
+  link.rel = 'stylesheet';
+  document.head.appendChild(link);
+};
+
 const Typography = ({ settings, onSettingsChange }: TypographyProps) => {
   const { user } = useAuth();
   const [localSettings, setLocalSettings] = useState<AppearanceSettings>(settings);
@@ -38,12 +50,21 @@ const Typography = ({ settings, onSettingsChange }: TypographyProps) => {
 
   useEffect(() => {
     setLocalSettings(settings);
+    // Load the font if it's a Google Font
+    if (settings.fontFamily && settings.fontFamily !== 'default' && settings.fontFamily !== 'custom') {
+      loadGoogleFont(settings.fontFamily);
+    }
   }, [settings]);
 
   const updateSettings = (updates: Partial<AppearanceSettings>) => {
     const newSettings = { ...localSettings, ...updates };
     setLocalSettings(newSettings);
     onSettingsChange(newSettings);
+    
+    // Load the font if changing to a Google Font
+    if (updates.fontFamily && updates.fontFamily !== 'default' && updates.fontFamily !== 'custom') {
+      loadGoogleFont(updates.fontFamily);
+    }
   };
 
   const handleFontFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,6 +113,21 @@ const Typography = ({ settings, onSettingsChange }: TypographyProps) => {
       const { data: { publicUrl } } = supabase.storage
         .from("profiles")
         .getPublicUrl(filePath);
+      
+      // Create a style element to load the custom font
+      const fontFaceStyle = document.createElement('style');
+      fontFaceStyle.textContent = `
+        @font-face {
+          font-family: 'CustomFont';
+          src: url('${publicUrl}') format('${customFontFile.name.endsWith('.ttf') ? 'truetype' : 
+                  customFontFile.name.endsWith('.otf') ? 'opentype' : 
+                  customFontFile.name.endsWith('.woff') ? 'woff' : 'woff2'}');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
+      `;
+      document.head.appendChild(fontFaceStyle);
         
       updateSettings({ 
         customFontUrl: publicUrl,
@@ -114,6 +150,29 @@ const Typography = ({ settings, onSettingsChange }: TypographyProps) => {
       setCustomFontFile(null);
     }
   };
+
+  // Load custom font if it exists
+  useEffect(() => {
+    if (settings.customFontUrl && settings.fontFamily === 'custom') {
+      const fontExt = settings.customFontUrl.split('.').pop() || '';
+      const fontFormat = 
+        fontExt === 'ttf' ? 'truetype' : 
+        fontExt === 'otf' ? 'opentype' : 
+        fontExt === 'woff' ? 'woff' : 'woff2';
+      
+      const style = document.createElement('style');
+      style.textContent = `
+        @font-face {
+          font-family: 'CustomFont';
+          src: url('${settings.customFontUrl}') format('${fontFormat}');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, [settings.customFontUrl, settings.fontFamily]);
 
   return (
     <div className="space-y-6">

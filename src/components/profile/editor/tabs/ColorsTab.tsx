@@ -11,6 +11,24 @@ type ColorsTabProps = {
 };
 
 const ColorsTab = ({ settings, onSettingsChange, setBackgroundFile }: ColorsTabProps) => {
+  const handleBackgroundImageChange = (file: File | null) => {
+    setBackgroundFile(file);
+    
+    // If removing the image, also update the background style
+    if (!file && settings.backgroundStyle === 'image') {
+      onSettingsChange({
+        ...settings,
+        backgroundStyle: 'solid'
+      });
+    } else if (file) {
+      // If adding an image, set the background style to image
+      onSettingsChange({
+        ...settings,
+        backgroundStyle: 'image'
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <AppearanceColorSettings 
@@ -19,10 +37,13 @@ const ColorsTab = ({ settings, onSettingsChange, setBackgroundFile }: ColorsTabP
       />
       
       <div className="space-y-2">
-        <h3 className="text-lg font-medium">Imagem de fundo</h3>
+        <Label className="text-base font-medium">Imagem de fundo</Label>
+        <p className="text-sm text-muted-foreground mb-2">
+          Faça upload de uma imagem personalizada para o fundo do seu perfil
+        </p>
         <BackgroundUpload
           initialUrl={settings.backgroundImage || null}
-          onFileChange={setBackgroundFile}
+          onFileChange={handleBackgroundImageChange}
         />
       </div>
     </div>

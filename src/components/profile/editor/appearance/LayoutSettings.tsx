@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { AppearanceSettings } from '@/types/profile';
 import { Label } from '@/components/ui/label';
@@ -52,9 +53,10 @@ const LayoutSettings = ({ settings, onSettingsChange }: LayoutSettingsProps) => 
   };
 
   const updateLayoutSettings = (key: string, value: any) => {
+    const currentLayoutSettings = localSettings.layoutSettings || {};
     updateSettings({
       layoutSettings: {
-        ...(localSettings.layoutSettings || {}),
+        ...currentLayoutSettings,
         [key]: value
       }
     });
@@ -136,6 +138,20 @@ const LayoutSettings = ({ settings, onSettingsChange }: LayoutSettingsProps) => 
                 id="show-bio"
                 checked={(localSettings.layoutSettings?.showBio ?? true)}
                 onCheckedChange={(checked) => updateLayoutSettings('showBio', checked)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="compact-links" className="block font-medium">Links compactos</Label>
+                <p className="text-sm text-muted-foreground">
+                  Exibe os links em um formato mais compacto
+                </p>
+              </div>
+              <Switch 
+                id="compact-links"
+                checked={(localSettings.layoutSettings?.compactLinks ?? false)}
+                onCheckedChange={(checked) => updateLayoutSettings('compactLinks', checked)}
               />
             </div>
           </CardContent>
