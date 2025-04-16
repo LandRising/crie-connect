@@ -1,9 +1,7 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AppearanceSettings } from '@/types/profile';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import { ButtonStyle } from '@/components/AppearanceSettings';
 import { ColorPicker } from './ColorPicker';
@@ -15,6 +13,11 @@ interface ButtonStylesProps {
 
 const ButtonStyles = ({ settings, onSettingsChange }: ButtonStylesProps) => {
   const [localSettings, setLocalSettings] = useState<AppearanceSettings>(settings);
+  
+  // Update local state when parent settings change
+  useEffect(() => {
+    setLocalSettings(settings);
+  }, [settings]);
 
   const updateSettings = (updates: Partial<AppearanceSettings>) => {
     const newSettings = { ...localSettings, ...updates };

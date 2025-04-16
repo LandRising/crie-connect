@@ -40,5 +40,16 @@ export const defaultAppearance: AppearanceSettings = {
   buttonColor: "#000000",
   backgroundColor: "#ffffff",
   backgroundStyle: "solid",
+  backgroundImage: "",
+  gradientColors: "",
+  fontFamily: "default",
+  customFontUrl: "",
+  iconStyle: "",
+  customIcons: {},
   layoutTemplate: "standard",
+  layoutSettings: {},
+  showAnalytics: false
 };
+
+// Re-export the types from AppearanceSettings.tsx for better organization
+export { ButtonStyle, ThemeType, BackgroundStyle } from "@/components/AppearanceSettings";

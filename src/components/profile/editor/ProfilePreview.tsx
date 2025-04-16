@@ -10,10 +10,10 @@ type ProfilePreviewProps = {
 
 export const ProfilePreview = ({ profile, appearance }: ProfilePreviewProps) => {
   const themeStyles = getThemeStyles(appearance.theme);
-  const buttonStyle = getButtonStyles(appearance.buttonStyle);
   
   const getBackgroundStyle = () => {
-    if (appearance.backgroundImage) {
+    // Handle image background
+    if (appearance.backgroundImage && appearance.backgroundStyle === 'image') {
       return {
         backgroundImage: `url(${appearance.backgroundImage})`,
         backgroundSize: 'cover',
@@ -21,10 +21,12 @@ export const ProfilePreview = ({ profile, appearance }: ProfilePreviewProps) => 
       };
     }
     
+    // Handle gradient background
     if (appearance.backgroundStyle === 'gradient' && appearance.gradientColors) {
       return { background: appearance.gradientColors };
     }
     
+    // Default to solid color
     return { backgroundColor: appearance.backgroundColor || '#ffffff' };
   };
 
@@ -42,18 +44,42 @@ export const ProfilePreview = ({ profile, appearance }: ProfilePreviewProps) => 
 
   // Custom color style for buttons
   const getCustomButtonStyle = () => {
-    const baseStyle = buttonStyle;
+    const buttonColor = appearance.buttonColor || '#000000';
     
-    if (appearance.buttonColor) {
-      const customColor = { 
-        backgroundColor: appearance.buttonStyle === 'outline' ? 'transparent' : appearance.buttonColor,
-        color: appearance.buttonStyle === 'outline' ? appearance.buttonColor : '#ffffff',
-        borderColor: appearance.buttonColor
+    if (appearance.buttonStyle === 'outline') {
+      return {
+        backgroundColor: 'transparent',
+        color: buttonColor,
+        borderColor: buttonColor,
+        border: '2px solid'
       };
-      return customColor;
+    }
+
+    let buttonStyles: React.CSSProperties = {
+      backgroundColor: buttonColor,
+      color: '#ffffff'
+    };
+
+    switch (appearance.buttonStyle) {
+      case 'rounded':
+        buttonStyles.borderRadius = '9999px';
+        break;
+      case 'shadow':
+        buttonStyles.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+        break;
+      case 'glass':
+        buttonStyles.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+        buttonStyles.backdropFilter = 'blur(8px)';
+        buttonStyles.border = '1px solid rgba(255, 255, 255, 0.3)';
+        break;
+      case 'soft':
+        buttonStyles.borderRadius = '12px';
+        break;
+      default:
+        buttonStyles.borderRadius = '6px';
     }
     
-    return {};
+    return buttonStyles;
   };
 
   return (
@@ -113,7 +139,7 @@ export const ProfilePreview = ({ profile, appearance }: ProfilePreviewProps) => 
               {[1, 2, 3].map((i) => (
                 <div 
                   key={i}
-                  className="py-2.5 px-4 w-full text-center rounded-md cursor-pointer"
+                  className="py-2.5 px-4 w-full text-center cursor-pointer"
                   style={getCustomButtonStyle()}
                 >
                   Link de Exemplo {i}

@@ -1,5 +1,7 @@
 
-export const getButtonStyles = (buttonStyle: string) => {
+import { ButtonStyle, ThemeType } from "@/types/profile";
+
+export const getButtonStyles = (buttonStyle: ButtonStyle) => {
   switch (buttonStyle) {
     case "outline":
       return "bg-transparent border-2 border-black text-black hover:bg-gray-100";
@@ -17,7 +19,7 @@ export const getButtonStyles = (buttonStyle: string) => {
   }
 };
 
-export const getThemeStyles = (theme: string) => {
+export const getThemeStyles = (theme: ThemeType) => {
   switch (theme) {
     case "dark":
       return {

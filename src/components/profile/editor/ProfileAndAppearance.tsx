@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Card, 
   CardContent, 
@@ -19,6 +19,7 @@ import { BackgroundUpload } from "@/components/profile/editor/BackgroundUpload";
 import { ProfilePreview } from "@/components/profile/editor/ProfilePreview";
 import { useProfileEditor } from "@/components/profile/editor/useProfileEditor";
 import { useAppearanceSettings } from "@/hooks/useAppearanceSettings";
+import { AppearanceSettings } from "@/types/profile";
 
 // Import Appearance Settings Components
 import AppearanceButtonStyles from "@/components/profile/editor/appearance/ButtonStyles";
@@ -26,8 +27,9 @@ import AppearanceColorSettings from "@/components/profile/editor/appearance/Colo
 import AppearanceTypography from "@/components/profile/editor/appearance/Typography";
 import AppearanceLayout from "@/components/profile/editor/appearance/LayoutSettings";
 
-import { Box, Layout, PaintBucket, Palette, Type, User } from "lucide-react";
+import { Box, Layout, Palette, Type, User } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ProfileAndAppearance = () => {
   const {
@@ -44,22 +46,36 @@ const ProfileAndAppearance = () => {
 
   const { 
     appearanceSettings, 
-    isLoading: appearanceLoading, 
+    isLoading: appearanceLoading,
+    initialized,
     saveAppearanceSettings,
+    setAppearanceSettings,
     setBackgroundFile
   } = useAppearanceSettings();
 
   const [activeTab, setActiveTab] = useState("profile-info");
   const [showPreview, setShowPreview] = useState(false);
+  const [localAppearance, setLocalAppearance] = useState<AppearanceSettings | null>(null);
   
   const isLoading = profileLoading || appearanceLoading;
+
+  // Update local state when appearance settings change
+  useEffect(() => {
+    if (appearanceSettings) {
+      setLocalAppearance(appearanceSettings);
+    }
+  }, [appearanceSettings]);
+
+  const handleAppearanceChange = (newSettings: AppearanceSettings) => {
+    setLocalAppearance(newSettings);
+  };
 
   const handleSave = async () => {
     try {
       await saveProfile();
       
-      if (appearanceSettings) {
-        await saveAppearanceSettings(appearanceSettings);
+      if (localAppearance) {
+        await saveAppearanceSettings(localAppearance);
       }
       
       toast({
@@ -84,6 +100,23 @@ const ProfileAndAppearance = () => {
             profile={profile} 
             onEditClick={() => setIsEditing(true)} 
           />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!initialized || !localAppearance) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Carregando configurações...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
         </CardContent>
       </Card>
     );
@@ -155,26 +188,26 @@ const ProfileAndAppearance = () => {
                 </TabsContent>
                 
                 <TabsContent value="button-style">
-                  {appearanceSettings && (
+                  {localAppearance && (
                     <AppearanceButtonStyles 
-                      settings={appearanceSettings} 
-                      onSettingsChange={(newSettings) => saveAppearanceSettings(newSettings)} 
+                      settings={localAppearance} 
+                      onSettingsChange={handleAppearanceChange} 
                     />
                   )}
                 </TabsContent>
                 
                 <TabsContent value="colors">
-                  {appearanceSettings && (
+                  {localAppearance && (
                     <div className="space-y-6">
                       <AppearanceColorSettings 
-                        settings={appearanceSettings} 
-                        onSettingsChange={(newSettings) => saveAppearanceSettings(newSettings)} 
+                        settings={localAppearance} 
+                        onSettingsChange={handleAppearanceChange} 
                       />
                       
                       <div className="space-y-2">
                         <h3 className="text-lg font-medium">Imagem de fundo</h3>
                         <BackgroundUpload
-                          initialUrl={appearanceSettings.backgroundImage || null}
+                          initialUrl={localAppearance.backgroundImage || null}
                           onFileChange={setBackgroundFile}
                         />
                       </div>
@@ -183,19 +216,19 @@ const ProfileAndAppearance = () => {
                 </TabsContent>
                 
                 <TabsContent value="typography">
-                  {appearanceSettings && (
+                  {localAppearance && (
                     <AppearanceTypography 
-                      settings={appearanceSettings} 
-                      onSettingsChange={(newSettings) => saveAppearanceSettings(newSettings)} 
+                      settings={localAppearance} 
+                      onSettingsChange={handleAppearanceChange} 
                     />
                   )}
                 </TabsContent>
                 
                 <TabsContent value="layout">
-                  {appearanceSettings && (
+                  {localAppearance && (
                     <AppearanceLayout 
-                      settings={appearanceSettings} 
-                      onSettingsChange={(newSettings) => saveAppearanceSettings(newSettings)} 
+                      settings={localAppearance} 
+                      onSettingsChange={handleAppearanceChange} 
                     />
                   )}
                 </TabsContent>
@@ -224,7 +257,7 @@ const ProfileAndAppearance = () => {
         </Card>
       </div>
       
-      {showPreview && appearanceSettings && (
+      {showPreview && localAppearance && (
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
@@ -234,7 +267,7 @@ const ProfileAndAppearance = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ProfilePreview profile={profile} appearance={appearanceSettings} />
+              <ProfilePreview profile={profile} appearance={localAppearance} />
             </CardContent>
           </Card>
         </div>

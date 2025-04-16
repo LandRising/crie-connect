@@ -60,23 +60,40 @@ const Profile = () => {
     );
   }
 
-  // Aplicar estilos de tema personalizados
-  const themeStyles = getThemeStyles(appearance.theme);
-  const bgStyle = appearance.backgroundStyle || "solid";
-  const bgColor = appearance.backgroundColor || (appearance.theme === 'dark' ? '#1A1F2C' : '#ffffff');
-  const customFont = appearance.fontFamily || '';
+  console.log("Profile page rendering with appearance:", appearance);
 
-  // Aplicar gradiente ou cor sólida de fundo
-  const backgroundStyles = bgStyle === 'gradient' && appearance.gradientColors 
-    ? { background: appearance.gradientColors } 
-    : { backgroundColor: bgColor };
+  // Aplicar estilos de tema personalizados
+  const themeStyles = getThemeStyles(appearance?.theme || 'light');
+  const bgStyle = appearance?.backgroundStyle || "solid";
+  const bgColor = appearance?.backgroundColor || (appearance?.theme === 'dark' ? '#1A1F2C' : '#ffffff');
+  const customFont = appearance?.fontFamily || '';
+
+  // Determinar o estilo de fundo com base nas configurações
+  const getBackgroundStyles = () => {
+    if (appearance?.backgroundImage && bgStyle === 'image') {
+      return {
+        backgroundImage: `url(${appearance.backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      };
+    }
+    
+    if (bgStyle === 'gradient' && appearance?.gradientColors) {
+      return { background: appearance.gradientColors };
+    }
+    
+    return { backgroundColor: bgColor };
+  };
+
+  const backgroundStyles = getBackgroundStyles();
 
   return (
     <div 
-      className={`min-h-screen-safe ${themeStyles.background}`}
+      className={`min-h-screen ${themeStyles.background}`}
       style={{
         ...backgroundStyles,
-        fontFamily: customFont ? `${customFont}, sans-serif` : 'inherit'
+        fontFamily: customFont && customFont !== 'default' ? `${customFont}, sans-serif` : 'inherit'
       }}
     >
       <ProfileCover coverUrl={profile.cover_url} />
@@ -88,14 +105,14 @@ const Profile = () => {
         
         <ProfileLinks 
           links={links} 
-          buttonStyle={appearance.buttonStyle} 
+          buttonStyle={appearance?.buttonStyle || 'default'} 
           getButtonStyles={getButtonStyles} 
-          buttonColor={appearance.buttonColor}
+          buttonColor={appearance?.buttonColor || '#000000'}
           profileId={profile.id}
         />
 
-        {/* Exibir analytics somente se o perfil pertencer ao usuário atual */}
-        {appearance.showAnalytics && <ProfileAnalytics profileId={profile.id} />}
+        {/* Exibir analytics somente se o perfil pertencer ao usuário atual e a configuração estiver habilitada */}
+        {appearance?.showAnalytics && <ProfileAnalytics profileId={profile.id} />}
       </div>
     </div>
   );

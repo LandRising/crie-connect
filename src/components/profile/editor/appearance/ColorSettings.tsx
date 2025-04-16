@@ -29,6 +29,7 @@ const gradientOptions = [
 const ColorSettings = ({ settings, onSettingsChange }: ColorSettingsProps) => {
   const [localSettings, setLocalSettings] = useState<AppearanceSettings>(settings);
 
+  // Update local state when parent settings change
   useEffect(() => {
     setLocalSettings(settings);
   }, [settings]);
