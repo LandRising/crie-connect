@@ -7,35 +7,34 @@ import {
   CardTitle, 
   CardDescription
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-
-import { ProfileFormView } from "@/components/profile/editor/ProfileFormView";
-import { ProfileForm } from "@/components/profile/editor/ProfileForm";
-import { ProfileImageUpload } from "@/components/profile/editor/ProfileImageUpload";
-import { CoverImageUpload } from "@/components/profile/editor/CoverImageUpload";
-import { BackgroundUpload } from "@/components/profile/editor/BackgroundUpload";
-import { ProfilePreview } from "@/components/profile/editor/ProfilePreview";
-import { useProfileEditor } from "@/components/profile/editor/useProfileEditor";
-import { useAppearanceSettings } from "@/hooks/useAppearanceSettings";
-import { AppearanceSettings } from "@/types/profile";
-
-// Import Appearance Settings Components
-import AppearanceButtonStyles from "@/components/profile/editor/appearance/ButtonStyles";
-import AppearanceColorSettings from "@/components/profile/editor/appearance/ColorSettings";
-import AppearanceTypography from "@/components/profile/editor/appearance/Typography";
-import AppearanceLayout from "@/components/profile/editor/appearance/LayoutSettings";
-
-import { Box, Layout, Palette, Type, User } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import { useProfileEditor } from "@/components/profile/editor/useProfileEditor";
+import { useAppearanceSettings } from "@/hooks/useAppearanceSettings";
+import { AppearanceSettings } from "@/types/profile";
+import { Box, Layout, Palette, Type, User } from "lucide-react";
+
+// Import Sub-Components
+import ProfileInfoTab from "@/components/profile/editor/tabs/ProfileInfoTab";
+import ButtonStylesTab from "@/components/profile/editor/tabs/ButtonStylesTab";
+import ColorsTab from "@/components/profile/editor/tabs/ColorsTab";
+import TypographyTab from "@/components/profile/editor/tabs/TypographyTab";
+import LayoutSettingsTab from "@/components/profile/editor/tabs/LayoutSettingsTab";
+import { ProfilePreview } from "@/components/profile/editor/ProfilePreview";
+
 type ProfileAndAppearanceProps = {
   activeTab?: string;
+  defaultPreviewVisible?: boolean;
 };
 
-const ProfileAndAppearance = ({ activeTab = "profile-info" }: ProfileAndAppearanceProps) => {
+const ProfileAndAppearance = ({ 
+  activeTab = "profile-info",
+  defaultPreviewVisible = true
+}: ProfileAndAppearanceProps) => {
   const {
     profile,
     isLoading: profileLoading,
@@ -58,7 +57,7 @@ const ProfileAndAppearance = ({ activeTab = "profile-info" }: ProfileAndAppearan
   } = useAppearanceSettings();
 
   const [localActiveTab, setLocalActiveTab] = useState(activeTab);
-  const [showPreview, setShowPreview] = useState(false);
+  const [showPreview, setShowPreview] = useState(defaultPreviewVisible);
   const [localAppearance, setLocalAppearance] = useState<AppearanceSettings | null>(null);
   
   const isLoading = profileLoading || appearanceLoading;
@@ -105,9 +104,10 @@ const ProfileAndAppearance = ({ activeTab = "profile-info" }: ProfileAndAppearan
     return (
       <Card>
         <CardContent className="pt-6">
-          <ProfileFormView 
+          <ProfileInfoTab 
             profile={profile} 
             onEditClick={() => setIsEditing(true)} 
+            viewMode={true}
           />
         </CardContent>
       </Card>
@@ -132,11 +132,11 @@ const ProfileAndAppearance = ({ activeTab = "profile-info" }: ProfileAndAppearan
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6">
       <div className={`lg:col-span-${showPreview ? '3' : '5'}`}>
         <Card>
           <CardHeader>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center flex-wrap gap-3">
               <div>
                 <CardTitle>Personalize seu perfil</CardTitle>
                 <CardDescription>Ajuste as informações e a aparência da sua página</CardDescription>
@@ -152,7 +152,7 @@ const ProfileAndAppearance = ({ activeTab = "profile-info" }: ProfileAndAppearan
           </CardHeader>
           <CardContent>
             <Tabs value={localActiveTab} onValueChange={setLocalActiveTab}>
-              <TabsList className="mb-6 w-full">
+              <TabsList className="mb-6 w-full overflow-auto flex-nowrap">
                 <TabsTrigger value="profile-info" className="flex items-center gap-2">
                   <User size={16} /> Informações
                 </TabsTrigger>
@@ -172,33 +172,19 @@ const ProfileAndAppearance = ({ activeTab = "profile-info" }: ProfileAndAppearan
               
               <ScrollArea className="max-h-[calc(100vh-250px)]">
                 <TabsContent value="profile-info">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <ProfileImageUpload
-                      initialUrl={profile.avatar_url}
-                      onFileChange={(file) => setAvatarFile(file)}
-                    />
-                    
-                    <CoverImageUpload
-                      initialUrl={profile.cover_url}
-                      onFileChange={(file) => setCoverFile(file)}
-                    />
-                  </div>
-                  
-                  <ProfileForm
+                  <ProfileInfoTab
                     profile={profile}
-                    onProfileChange={setProfile}
-                    onCancel={() => {
-                      setIsEditing(false);
-                      fetchProfile();
-                    }}
-                    onSubmit={handleSave}
-                    isLoading={isLoading}
+                    setProfile={setProfile}
+                    setAvatarFile={setAvatarFile}
+                    setCoverFile={setCoverFile}
+                    onEditClick={() => {}}
+                    viewMode={false}
                   />
                 </TabsContent>
                 
                 <TabsContent value="button-style">
                   {localAppearance && (
-                    <AppearanceButtonStyles 
+                    <ButtonStylesTab 
                       settings={localAppearance} 
                       onSettingsChange={handleAppearanceChange} 
                     />
@@ -207,26 +193,17 @@ const ProfileAndAppearance = ({ activeTab = "profile-info" }: ProfileAndAppearan
                 
                 <TabsContent value="colors">
                   {localAppearance && (
-                    <div className="space-y-6">
-                      <AppearanceColorSettings 
-                        settings={localAppearance} 
-                        onSettingsChange={handleAppearanceChange} 
-                      />
-                      
-                      <div className="space-y-2">
-                        <h3 className="text-lg font-medium">Imagem de fundo</h3>
-                        <BackgroundUpload
-                          initialUrl={localAppearance.backgroundImage || null}
-                          onFileChange={setBackgroundFile}
-                        />
-                      </div>
-                    </div>
+                    <ColorsTab 
+                      settings={localAppearance} 
+                      onSettingsChange={handleAppearanceChange}
+                      setBackgroundFile={setBackgroundFile}
+                    />
                   )}
                 </TabsContent>
                 
                 <TabsContent value="typography">
                   {localAppearance && (
-                    <AppearanceTypography 
+                    <TypographyTab 
                       settings={localAppearance} 
                       onSettingsChange={handleAppearanceChange} 
                     />
@@ -235,7 +212,7 @@ const ProfileAndAppearance = ({ activeTab = "profile-info" }: ProfileAndAppearan
                 
                 <TabsContent value="layout">
                   {localAppearance && (
-                    <AppearanceLayout 
+                    <LayoutSettingsTab 
                       settings={localAppearance} 
                       onSettingsChange={handleAppearanceChange} 
                     />
