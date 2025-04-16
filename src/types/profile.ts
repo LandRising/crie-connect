@@ -21,7 +21,7 @@ export type AppearanceSettings = {
   theme: ThemeType;
   buttonColor?: string;
   backgroundColor?: string;
-  backgroundStyle?: BackgroundStyle;
+  backgroundStyle?: BackgroundStyle | "image"; // Added "image" as a possible value
   backgroundImage?: string;
   gradientColors?: string;
   fontFamily?: string;
@@ -51,5 +51,5 @@ export const defaultAppearance: AppearanceSettings = {
   showAnalytics: false
 };
 
-// Re-export the types from AppearanceSettings.tsx for better organization
-export { ButtonStyle, ThemeType, BackgroundStyle } from "@/components/AppearanceSettings";
+// Re-export the types correctly with 'export type'
+export type { ButtonStyle, ThemeType, BackgroundStyle } from "@/components/AppearanceSettings";

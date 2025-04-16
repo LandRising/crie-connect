@@ -48,7 +48,7 @@ const ColorSettings = ({ settings, onSettingsChange }: ColorSettingsProps) => {
           type="single" 
           value={localSettings.backgroundStyle || 'solid'} 
           onValueChange={(value) => value && updateSettings({ 
-            backgroundStyle: value as any 
+            backgroundStyle: value as AppearanceSettings['backgroundStyle']
           })}
           className="justify-start"
         >

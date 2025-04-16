@@ -16,7 +16,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export type ButtonStyle = "default" | "outline" | "rounded" | "shadow" | "glass" | "soft";
 export type ThemeType = "light" | "dark" | "black" | "purple" | "blue";
-export type BackgroundStyle = "solid" | "gradient";
+export type BackgroundStyle = "solid" | "gradient" | "image";
 
 export type AppearanceSettings = {
   buttonStyle: ButtonStyle;
