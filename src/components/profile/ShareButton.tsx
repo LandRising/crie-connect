@@ -11,14 +11,14 @@ import { ProfileData } from "@/types/profile";
 
 type ShareButtonProps = {
   profile: ProfileData;
-  themeStyles: {
+  themeStyles?: {
     text: string;
     subtext: string;
     background?: string;
   };
 };
 
-export const ShareButton = ({ profile, themeStyles }: ShareButtonProps) => {
+export const ShareButton = ({ profile, themeStyles = { text: "", subtext: "" } }: ShareButtonProps) => {
   const handleShare = async () => {
     const url = window.location.href;
     

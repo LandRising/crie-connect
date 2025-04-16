@@ -28,19 +28,19 @@ export const useAppearanceSettings = () => {
       if (data) {
         // Create settings object with fallbacks for fields that might not exist in database yet
         setAppearanceSettings({
-          buttonStyle: data.button_style as any || "default",
-          theme: data.theme as any || "light",
+          buttonStyle: data.button_style || "default",
+          theme: data.theme || "light",
           buttonColor: data.button_color || "#000000",
           backgroundColor: data.background_color || "#ffffff",
-          backgroundStyle: data.background_style as any || "solid",
-          backgroundImage: data.background_image || "",
+          backgroundStyle: data.background_style || "solid",
+          backgroundImage: data.background_image || "",  // Handle as empty string if not in DB
           gradientColors: data.gradient_colors || "",
           fontFamily: data.font_family || "default",
-          customFontUrl: data.custom_font_url || "",
-          iconStyle: data.icon_style || "",
-          customIcons: data.custom_icons || {},
-          layoutTemplate: data.layout_template || "standard",
-          layoutSettings: data.layout_settings || {},
+          customFontUrl: data.custom_font_url || "",     // Handle as empty string if not in DB
+          iconStyle: data.icon_style || "",             // Handle as empty string if not in DB
+          customIcons: data.custom_icons || {},         // Handle as empty object if not in DB
+          layoutTemplate: data.layout_template || "standard", // Handle as default if not in DB
+          layoutSettings: data.layout_settings || {},   // Handle as empty object if not in DB
           showAnalytics: data.show_analytics || false
         });
       } else {

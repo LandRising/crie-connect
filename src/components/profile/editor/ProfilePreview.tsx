@@ -10,7 +10,7 @@ type ProfilePreviewProps = {
 
 export const ProfilePreview = ({ profile, appearance }: ProfilePreviewProps) => {
   const themeStyles = getThemeStyles(appearance.theme);
-  const buttonStyle = getButtonStyles(appearance.buttonStyle, appearance.buttonColor);
+  const buttonStyle = getButtonStyles(appearance.buttonStyle);
   
   const getBackgroundStyle = () => {
     if (appearance.backgroundImage) {
@@ -35,6 +35,22 @@ export const ProfilePreview = ({ profile, appearance }: ProfilePreviewProps) => 
     
     if (appearance.fontFamily && appearance.fontFamily !== 'default') {
       return { fontFamily: `${appearance.fontFamily}, sans-serif` };
+    }
+    
+    return {};
+  };
+
+  // Custom color style for buttons
+  const getCustomButtonStyle = () => {
+    const baseStyle = buttonStyle;
+    
+    if (appearance.buttonColor) {
+      const customColor = { 
+        backgroundColor: appearance.buttonStyle === 'outline' ? 'transparent' : appearance.buttonColor,
+        color: appearance.buttonStyle === 'outline' ? appearance.buttonColor : '#ffffff',
+        borderColor: appearance.buttonColor
+      };
+      return customColor;
     }
     
     return {};
@@ -98,7 +114,7 @@ export const ProfilePreview = ({ profile, appearance }: ProfilePreviewProps) => 
                 <div 
                   key={i}
                   className="py-2.5 px-4 w-full text-center rounded-md cursor-pointer"
-                  style={buttonStyle}
+                  style={getCustomButtonStyle()}
                 >
                   Link de Exemplo {i}
                 </div>
