@@ -39,9 +39,15 @@ export const useAppearanceSettings = () => {
           fontFamily: data.font_family || "default",
           customFontUrl: data.custom_font_url || "",
           iconStyle: data.icon_style || "",
-          customIcons: data.custom_icons || {},
+          // Properly handle JSON data by checking its type and providing a default empty object
+          customIcons: typeof data.custom_icons === 'object' && data.custom_icons !== null 
+            ? data.custom_icons as Record<string, string> 
+            : {},
           layoutTemplate: data.layout_template || "standard",
-          layoutSettings: data.layout_settings || {},
+          // Properly handle JSON data by checking its type and providing a default empty object
+          layoutSettings: typeof data.layout_settings === 'object' && data.layout_settings !== null 
+            ? data.layout_settings as Record<string, any> 
+            : {},
           showAnalytics: data.show_analytics || false
         });
       } else {
