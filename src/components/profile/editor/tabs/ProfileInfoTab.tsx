@@ -1,13 +1,13 @@
 
-import { Profile } from "@/types/profile";
+import { ProfileData } from "@/types/profile";
 import { ProfileForm } from "@/components/profile/editor/ProfileForm";
 import { ProfileFormView } from "@/components/profile/editor/ProfileFormView";
 import { ProfileImageUpload } from "@/components/profile/editor/ProfileImageUpload";
 import { CoverImageUpload } from "@/components/profile/editor/CoverImageUpload";
 
 type ProfileInfoTabProps = {
-  profile: Profile;
-  setProfile?: (profile: Profile) => void;
+  profile: ProfileData;
+  setProfile?: (profile: ProfileData) => void;
   setAvatarFile?: (file: File | null) => void;
   setCoverFile?: (file: File | null) => void;
   onEditClick: () => void;
