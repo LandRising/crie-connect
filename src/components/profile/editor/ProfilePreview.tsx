@@ -2,7 +2,6 @@
 import React from 'react';
 import { ProfileData, AppearanceSettings } from '@/types/profile';
 import { getThemeStyles, getButtonStyles } from '@/utils/profileStyles';
-import { Button } from '@/components/ui/button';
 
 type ProfilePreviewProps = {
   profile: ProfileData;
@@ -98,8 +97,8 @@ export const ProfilePreview = ({ profile, appearance }: ProfilePreviewProps) => 
               {[1, 2, 3].map((i) => (
                 <div 
                   key={i}
-                  style={buttonStyle} 
                   className="py-2.5 px-4 w-full text-center rounded-md cursor-pointer"
+                  style={buttonStyle}
                 >
                   Link de Exemplo {i}
                 </div>

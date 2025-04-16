@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Eyedropper } from 'lucide-react';
+import { Paintbrush } from 'lucide-react';
 
 interface ColorPickerProps {
   color: string;
@@ -28,7 +28,7 @@ export const ColorPicker = ({ color, onChange, label }: ColorPickerProps) => {
               style={{ backgroundColor: color }}
             >
               <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black/10 transition-opacity">
-                <Eyedropper className="h-4 w-4 text-white drop-shadow-sm" />
+                <Paintbrush className="h-4 w-4 text-white drop-shadow-sm" />
               </div>
             </div>
           </PopoverTrigger>

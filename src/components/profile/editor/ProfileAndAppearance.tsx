@@ -26,7 +26,7 @@ import AppearanceColorSettings from "@/components/profile/editor/appearance/Colo
 import AppearanceTypography from "@/components/profile/editor/appearance/Typography";
 import AppearanceLayout from "@/components/profile/editor/appearance/LayoutSettings";
 
-import { Box, ColorSwatch, Layout, PaintBucket, Palette, Type, User } from "lucide-react";
+import { Box, Layout, PaintBucket, Palette, Type, User } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const ProfileAndAppearance = () => {

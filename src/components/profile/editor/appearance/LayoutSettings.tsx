@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { AppearanceSettings } from '@/types/profile';
 import { Label } from '@/components/ui/label';
@@ -6,7 +5,6 @@ import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Range } from '@/components/ui/tabs';
 
 interface LayoutSettingsProps {
   settings: AppearanceSettings;

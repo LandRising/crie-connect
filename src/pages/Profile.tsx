@@ -82,7 +82,7 @@ const Profile = () => {
       <ProfileCover coverUrl={profile.cover_url} />
       
       <div className="relative z-10 mx-auto max-w-3xl px-4 pb-20 pt-4">
-        <ShareButton profile={profile} themeStyles={themeStyles} />
+        <ShareButton profile={profile} />
         
         <ProfileHeader profile={profile} themeStyles={themeStyles} />
         
