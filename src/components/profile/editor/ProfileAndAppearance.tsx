@@ -31,7 +31,11 @@ import { Box, Layout, Palette, Type, User } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const ProfileAndAppearance = () => {
+type ProfileAndAppearanceProps = {
+  activeTab?: string;
+};
+
+const ProfileAndAppearance = ({ activeTab = "profile-info" }: ProfileAndAppearanceProps) => {
   const {
     profile,
     isLoading: profileLoading,
@@ -53,7 +57,7 @@ const ProfileAndAppearance = () => {
     setBackgroundFile
   } = useAppearanceSettings();
 
-  const [activeTab, setActiveTab] = useState("profile-info");
+  const [localActiveTab, setLocalActiveTab] = useState(activeTab);
   const [showPreview, setShowPreview] = useState(false);
   const [localAppearance, setLocalAppearance] = useState<AppearanceSettings | null>(null);
   
@@ -65,6 +69,11 @@ const ProfileAndAppearance = () => {
       setLocalAppearance(appearanceSettings);
     }
   }, [appearanceSettings]);
+
+  // Update local active tab when prop changes
+  useEffect(() => {
+    setLocalActiveTab(activeTab);
+  }, [activeTab]);
 
   const handleAppearanceChange = (newSettings: AppearanceSettings) => {
     setLocalAppearance(newSettings);
@@ -129,8 +138,8 @@ const ProfileAndAppearance = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle>Editar Perfil</CardTitle>
-                <CardDescription>Personalize seu perfil e aparência</CardDescription>
+                <CardTitle>Personalize seu perfil</CardTitle>
+                <CardDescription>Ajuste as informações e a aparência da sua página</CardDescription>
               </div>
               <Button 
                 variant="outline" 
@@ -142,7 +151,7 @@ const ProfileAndAppearance = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <Tabs value={localActiveTab} onValueChange={setLocalActiveTab}>
               <TabsList className="mb-6 w-full">
                 <TabsTrigger value="profile-info" className="flex items-center gap-2">
                   <User size={16} /> Informações

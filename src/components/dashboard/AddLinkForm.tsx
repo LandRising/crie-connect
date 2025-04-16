@@ -1,8 +1,8 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Plus, Link2 } from "lucide-react";
 
 type AddLinkFormProps = {
   newLink: {
@@ -14,41 +14,58 @@ type AddLinkFormProps = {
 };
 
 const AddLinkForm = ({ newLink, onLinkChange, onSubmit }: AddLinkFormProps) => {
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let url = e.target.value;
+    
+    // Auto-add https:// if not present and not empty
+    if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+      url = `https://${url}`;
+    }
+    
+    onLinkChange({ ...newLink, url });
+  };
+  
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Adicionar novo link</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="title" className="text-sm font-medium">
-              Título
-            </label>
-            <Input
-              id="title"
-              value={newLink.title}
-              onChange={(e) => onLinkChange({ ...newLink, title: e.target.value })}
-              placeholder="Ex: Meu Website"
-            />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="url" className="text-sm font-medium">
-              URL
-            </label>
+    <form onSubmit={onSubmit} className="space-y-4">
+      <div className="grid gap-6">
+        <div className="grid gap-3">
+          <Label htmlFor="title" className="text-sm font-medium">
+            Título do link
+          </Label>
+          <Input
+            id="title"
+            value={newLink.title}
+            onChange={(e) => onLinkChange({ ...newLink, title: e.target.value })}
+            placeholder="Meu Website"
+            className="h-10"
+          />
+        </div>
+        
+        <div className="grid gap-3">
+          <Label htmlFor="url" className="text-sm font-medium">
+            URL do link
+          </Label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Link2 className="h-4 w-4 text-muted-foreground" />
+            </div>
             <Input
               id="url"
               value={newLink.url}
-              onChange={(e) => onLinkChange({ ...newLink, url: e.target.value })}
-              placeholder="Ex: https://meusite.com"
+              onChange={handleUrlChange}
+              placeholder="https://meusite.com"
+              className="pl-10 h-10"
             />
           </div>
-          <Button type="submit" className="w-full">
-            <Plus size={16} className="mr-2" /> Adicionar Link
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+        </div>
+      </div>
+      
+      <div className="flex justify-end">
+        <Button type="submit" className="w-full sm:w-auto">
+          <Plus size={16} className="mr-2" /> Adicionar Link
+        </Button>
+      </div>
+    </form>
   );
 };
 

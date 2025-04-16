@@ -5,14 +5,25 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/components/AuthProvider";
+import { useAuth } from "@/components/AuthProvider";
+import { useEffect } from "react";
+
+// Páginas
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
 import Dashboard from "@/pages/Dashboard";
 import Profile from "@/pages/Profile";
 import NotFound from "@/pages/NotFound";
+
+// Dashboard
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import DashboardLinks from "@/pages/dashboard/DashboardLinks";
+import DashboardAppearance from "@/pages/dashboard/DashboardAppearance";
+import DashboardAnalytics from "@/pages/dashboard/DashboardAnalytics";
+import DashboardProfile from "@/pages/dashboard/DashboardProfile";
+import DashboardSettings from "@/pages/dashboard/DashboardSettings";
+
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { useEffect } from "react";
-import { useAuth } from "@/components/AuthProvider";
 
 const queryClient = new QueryClient();
 
@@ -64,11 +75,21 @@ const AppRoutes = () => {
           <Auth />
         </RedirectIfAuthenticated>
       } />
+      
+      {/* Dashboard routes with layout */}
       <Route path="/dashboard" element={
         <ProtectedRoute>
-          <Dashboard />
+          <DashboardLayout />
         </ProtectedRoute>
-      } />
+      }>
+        <Route index element={<Dashboard />} />
+        <Route path="links" element={<DashboardLinks />} />
+        <Route path="appearance" element={<DashboardAppearance />} />
+        <Route path="analytics" element={<DashboardAnalytics />} />
+        <Route path="profile" element={<DashboardProfile />} />
+        <Route path="settings" element={<DashboardSettings />} />
+      </Route>
+      
       <Route path="/:username" element={<Profile />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
