@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -8,6 +9,7 @@ import {
   Palette, BarChart3, Settings, User, LogOut 
 } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
+import { useAuth } from '@/components/AuthProvider';
 
 type SidebarProps = {
   collapsed: boolean;
@@ -46,6 +48,7 @@ const NavItem = ({ icon: Icon, label, href, active, collapsed, onClick }: NavIte
 export const Sidebar = ({ collapsed, onToggle, isMobileSheet = false, onNavigation }: SidebarProps) => {
   const location = useLocation();
   const { username } = useProfile();
+  const { signOut } = useAuth();
 
   // Função para verificar se uma rota está ativa
   const isActive = (path: string) => {
@@ -56,6 +59,10 @@ export const Sidebar = ({ collapsed, onToggle, isMobileSheet = false, onNavigati
     if (isMobileSheet && onNavigation) {
       onNavigation();
     }
+  };
+
+  const handleSignOut = () => {
+    signOut();
   };
 
   return (
@@ -98,7 +105,7 @@ export const Sidebar = ({ collapsed, onToggle, isMobileSheet = false, onNavigati
             href="/dashboard" 
             active={isActive("/dashboard") && !isActive("/dashboard/links") && 
                     !isActive("/dashboard/appearance") && !isActive("/dashboard/analytics") && 
-                    !isActive("/dashboard/profile") && !isActive("/dashboard/settings")}
+                    !isActive("/dashboard/settings")}
             collapsed={collapsed && !isMobileSheet}
             onClick={() => handleNavigation("dashboard")}
           />
@@ -155,7 +162,12 @@ export const Sidebar = ({ collapsed, onToggle, isMobileSheet = false, onNavigati
               </div>
             </div>
 
-            <Button variant="ghost" size="sm" className="mt-2 justify-start">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="mt-2 justify-start"
+              onClick={handleSignOut}
+            >
               <LogOut size={16} className="mr-2" /> Sair
             </Button>
           </div>
@@ -166,7 +178,12 @@ export const Sidebar = ({ collapsed, onToggle, isMobileSheet = false, onNavigati
             <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
               <User size={16} className="text-muted-foreground" />
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8"
+              onClick={handleSignOut}
+            >
               <LogOut size={16} />
             </Button>
           </div>
