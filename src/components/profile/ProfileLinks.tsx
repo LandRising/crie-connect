@@ -40,7 +40,8 @@ export const ProfileLinks = ({
   };
 
   // Apply compact styling if enabled
-  const buttonPadding = compact ? "py-2 px-4" : "py-4 px-6";
+  const buttonPadding = compact ? "py-2 px-4" : "py-3 px-4";
+  const buttonHeight = compact ? "min-h-[44px]" : "min-h-[52px]";
 
   return (
     <div className="space-y-3">
@@ -56,14 +57,15 @@ export const ProfileLinks = ({
           <Button
             variant="outline"
             className={cn(
-              "w-full justify-between h-auto text-base font-medium",
-              buttonPadding, // Apply dynamic padding
+              "w-full justify-between h-auto text-base font-medium flex items-center",
+              buttonPadding,
+              buttonHeight,
               getButtonStyles(buttonStyle)
             )}
             style={customColor}
           >
-            {link.title}
-            <ExternalLink size={18} />
+            <span className="truncate mr-2">{link.title}</span>
+            <ExternalLink size={18} className="flex-shrink-0" />
           </Button>
         </a>
       ))}

@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
@@ -47,6 +46,19 @@ const LinkItem = ({ link, index, moveCard, handleDelete, toggleActive }: LinkIte
     moveCard(dragIndex, index);
   };
 
+  const truncateUrl = (url: string) => {
+    try {
+      const urlObj = new URL(url);
+      const domain = urlObj.hostname;
+      
+      if (url.length <= 30) return url;
+      
+      return domain;
+    } catch (e) {
+      return url.length > 30 ? url.substring(0, 27) + "..." : url;
+    }
+  };
+
   return (
     <div
       ref={ref}
@@ -60,25 +72,25 @@ const LinkItem = ({ link, index, moveCard, handleDelete, toggleActive }: LinkIte
         !link.active && "bg-gray-50"
       )}
     >
-      <div className="flex items-center">
+      <div className="flex items-center flex-1 min-w-0">
         <div className="cursor-move mr-3 text-gray-400">
           <GripVertical size={20} />
         </div>
-        <div>
-          <h3 className={cn("font-medium", !link.active && "text-gray-500")}>{link.title}</h3>
+        <div className="overflow-hidden">
+          <h3 className={cn("font-medium truncate", !link.active && "text-gray-500")}>{link.title}</h3>
           <a
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-gray-500 flex items-center"
           >
-            {link.url.length > 30 ? link.url.substring(0, 30) + "..." : link.url}{" "}
-            <ExternalLink size={14} className="ml-1" />
+            <span className="truncate max-w-[150px] inline-block">{truncateUrl(link.url)}</span>
+            <ExternalLink size={14} className="ml-1 flex-shrink-0" />
           </a>
         </div>
       </div>
-      <div className="flex items-center space-x-2">
-        <div className="flex items-center mr-2">
+      <div className="flex items-center space-x-2 ml-2">
+        <div className="flex items-center">
           <Switch
             checked={link.active}
             onCheckedChange={(checked) => toggleActive(link.id, checked)}
@@ -88,6 +100,7 @@ const LinkItem = ({ link, index, moveCard, handleDelete, toggleActive }: LinkIte
           variant="outline"
           size="icon"
           onClick={() => handleDelete(link.id)}
+          className="flex-shrink-0"
         >
           <Trash size={16} />
         </Button>
@@ -100,7 +113,6 @@ const LinkSorter = ({ links: initialLinks, onUpdate }: { links: Link[], onUpdate
   const [links, setLinks] = useState<Link[]>(initialLinks);
   const [hasChanges, setHasChanges] = useState(false);
 
-  // Update local links when prop changes
   useEffect(() => {
     setLinks(initialLinks);
   }, [initialLinks]);
@@ -113,7 +125,6 @@ const LinkSorter = ({ links: initialLinks, onUpdate }: { links: Link[], onUpdate
     newLinks.splice(dragIndex, 1);
     newLinks.splice(hoverIndex, 0, draggedLink);
     
-    // Update order positions
     const updatedLinks = newLinks.map((link, idx) => ({
       ...link,
       order_position: idx
@@ -169,7 +180,6 @@ const LinkSorter = ({ links: initialLinks, onUpdate }: { links: Link[], onUpdate
 
   const saveOrder = async () => {
     try {
-      // Update all links with their new order positions
       const updates = links.map((link) => ({
         id: link.id,
         order_position: link.order_position

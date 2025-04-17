@@ -5,9 +5,8 @@ import { useLinks } from "@/hooks/useLinks";
 import { Card, CardContent } from "@/components/ui/card";
 import AddLinkForm from "./AddLinkForm";
 import LinkSorter from "@/components/LinkSorter";
-import DashboardHeader from "./DashboardHeader";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Link2, ExternalLink } from "lucide-react";
+import { PlusCircle, Link2, ExternalLink, X } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 
 const LinksManager = () => {
@@ -27,25 +26,33 @@ const LinksManager = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <DashboardHeader 
-        title="Meus Links" 
-        description="Gerencie seus links para compartilhar com seus seguidores"
-        actions={
-          <Button 
-            variant={showAddForm ? "outline" : "default"}
-            onClick={() => setShowAddForm(!showAddForm)}
-          >
-            {showAddForm 
-              ? "Cancelar" 
-              : <>
-                  <PlusCircle size={16} className="mr-2" />
-                  Novo Link
-                </>
-            }
-          </Button>
-        }
-      />
+    <div className="space-y-6 max-w-3xl mx-auto">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-xl font-semibold">Meus Links</h2>
+          <p className="text-sm text-muted-foreground">
+            Gerencie seus links para compartilhar com seus seguidores
+          </p>
+        </div>
+        <Button 
+          variant={showAddForm ? "outline" : "default"}
+          size="sm"
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="flex items-center gap-1.5"
+        >
+          {showAddForm ? (
+            <>
+              <X size={16} />
+              <span className="hidden sm:inline">Cancelar</span>
+            </>
+          ) : (
+            <>
+              <PlusCircle size={16} />
+              <span className="hidden sm:inline">Novo Link</span>
+            </>
+          )}
+        </Button>
+      </div>
       
       {showAddForm && (
         <Card className="mb-6">
@@ -87,10 +94,10 @@ const LinksManager = () => {
                   <Button 
                     variant="outline" 
                     onClick={() => window.open(`/${username}`, '_blank')}
-                    className="w-full max-w-sm"
+                    className="w-full max-w-sm flex items-center gap-1.5"
                   >
-                    <ExternalLink size={16} className="mr-2" />
-                    Ver minha página
+                    <ExternalLink size={16} />
+                    <span>Ver minha página</span>
                   </Button>
                 </div>
               )}
