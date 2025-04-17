@@ -47,17 +47,13 @@ const NavItem = ({ icon: Icon, label, href, active, collapsed, onClick }: NavIte
 export const Sidebar = ({ collapsed, onToggle, isMobileSheet = false, onNavigation }: SidebarProps) => {
   const location = useLocation();
   const { username } = useProfile();
-  const [activeTab, setActiveTab] = useState<string>(
-    location.pathname === "/dashboard" ? "links" : location.pathname.split('/').pop() || "links"
-  );
 
+  // Função para verificar se uma rota está ativa
   const isActive = (path: string) => {
-    if (path === "links" && location.pathname === "/dashboard") return true;
-    return location.pathname.includes(path);
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
   
   const handleNavigation = (tab: string) => {
-    setActiveTab(tab);
     if (isMobileSheet && onNavigation) {
       onNavigation();
     }
@@ -101,15 +97,17 @@ export const Sidebar = ({ collapsed, onToggle, isMobileSheet = false, onNavigati
             icon={LayoutDashboard} 
             label="Dashboard"
             href="/dashboard" 
-            active={activeTab === "links"} 
+            active={isActive("/dashboard") && !isActive("/dashboard/links") && 
+                    !isActive("/dashboard/appearance") && !isActive("/dashboard/analytics") && 
+                    !isActive("/dashboard/profile") && !isActive("/dashboard/settings")}
             collapsed={collapsed && !isMobileSheet}
-            onClick={() => handleNavigation("links")}
+            onClick={() => handleNavigation("dashboard")}
           />
           <NavItem 
             icon={LinkIcon} 
             label="Links" 
             href="/dashboard/links" 
-            active={isActive("links")}
+            active={isActive("/dashboard/links")}
             collapsed={collapsed && !isMobileSheet}
             onClick={() => handleNavigation("links")}
           />
@@ -117,7 +115,7 @@ export const Sidebar = ({ collapsed, onToggle, isMobileSheet = false, onNavigati
             icon={Palette} 
             label="Aparência" 
             href="/dashboard/appearance" 
-            active={isActive("appearance")}
+            active={isActive("/dashboard/appearance")}
             collapsed={collapsed && !isMobileSheet}
             onClick={() => handleNavigation("appearance")}
           />
@@ -125,7 +123,7 @@ export const Sidebar = ({ collapsed, onToggle, isMobileSheet = false, onNavigati
             icon={BarChart3} 
             label="Analytics" 
             href="/dashboard/analytics" 
-            active={isActive("analytics")}
+            active={isActive("/dashboard/analytics")}
             collapsed={collapsed && !isMobileSheet}
             onClick={() => handleNavigation("analytics")}
           />
@@ -133,7 +131,7 @@ export const Sidebar = ({ collapsed, onToggle, isMobileSheet = false, onNavigati
             icon={User} 
             label="Perfil" 
             href="/dashboard/profile" 
-            active={isActive("profile")}
+            active={isActive("/dashboard/profile")}
             collapsed={collapsed && !isMobileSheet}
             onClick={() => handleNavigation("profile")}
           />
@@ -141,7 +139,7 @@ export const Sidebar = ({ collapsed, onToggle, isMobileSheet = false, onNavigati
             icon={Settings} 
             label="Configurações" 
             href="/dashboard/settings" 
-            active={isActive("settings")}
+            active={isActive("/dashboard/settings")}
             collapsed={collapsed && !isMobileSheet}
             onClick={() => handleNavigation("settings")}
           />
