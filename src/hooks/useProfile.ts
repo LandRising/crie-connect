@@ -7,6 +7,8 @@ import { useAuth } from "@/components/AuthProvider";
 export const useProfile = () => {
   const { user } = useAuth();
   const [username, setUsername] = useState("");
+  const [profile, setProfile] = useState(null);
+  const profileId = user?.id || null;
 
   const fetchProfile = async () => {
     try {
@@ -14,12 +16,13 @@ export const useProfile = () => {
       
       const { data, error } = await supabase
         .from("profiles")
-        .select("username")
+        .select("username, full_name, avatar_url, cover_url, bio")
         .eq("id", user.id)
         .single();
       
       if (error) throw error;
       setUsername(data.username);
+      setProfile(data);
     } catch (error: any) {
       toast({
         title: "Erro ao carregar perfil",
@@ -35,6 +38,8 @@ export const useProfile = () => {
 
   return {
     username,
+    profile,
+    profileId,
     fetchProfile
   };
 };

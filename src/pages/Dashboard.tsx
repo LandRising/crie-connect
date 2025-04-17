@@ -6,13 +6,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { useProfile } from "@/hooks/useProfile";
 
-// Componentes para o dashboard principal
-import StatsCards from "@/components/analytics/StatsCards";
+// Import StatsCards correctly with named import instead of default import
+import { StatsCards } from "@/components/analytics/StatsCards";
 
 const Dashboard = () => {
   // Certificar que o usuário está autenticado
   useAutoRedirect(undefined, "/auth");
-  const { profile, profileId } = useProfile();
+  const { username } = useProfile();
   
   // Definir o título da página
   useEffect(() => {
@@ -21,7 +21,7 @@ const Dashboard = () => {
 
   // Buscar estatísticas básicas para exibir no dashboard principal
   const { data: stats } = useQuery({
-    queryKey: ['dashboard-stats', profileId],
+    queryKey: ['dashboard-stats', username],
     queryFn: async () => {
       // Normalmente aqui você buscaria dados do backend
       // Retornando dados de exemplo por enquanto
@@ -32,14 +32,14 @@ const Dashboard = () => {
         topLink: "Instagram"
       };
     },
-    enabled: !!profileId
+    enabled: !!username
   });
 
   return (
     <div className="space-y-4 md:space-y-6 pb-6">
       <DashboardHeader 
         title="Dashboard" 
-        description={`Bem-vindo, ${profile?.name || '@' + profile?.username || 'usuário'}! Aqui está um resumo da sua página.`}
+        description={`Bem-vindo, ${username || 'usuário'}! Aqui está um resumo da sua página.`}
       />
       
       <Card>
