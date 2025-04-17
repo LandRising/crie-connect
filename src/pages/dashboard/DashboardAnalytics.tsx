@@ -4,16 +4,16 @@ import DashboardAnalyticsComponent from "@/components/analytics/DashboardAnalyti
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 
 const DashboardAnalytics = () => {
-  // Definir o título da página
+  // Set the page title
   useEffect(() => {
-    document.title = "Analytics | CRIEConnect";
+    document.title = "Analytics Dashboard | CRIEConnect";
   }, []);
   
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-4 md:space-y-6 pb-6">
       <DashboardHeader 
-        title="Analytics" 
-        description="Estatísticas e dados sobre seus visitantes"
+        title="Analytics Dashboard" 
+        description="Comprehensive insights and performance metrics for your page"
       />
       <DashboardAnalyticsComponent />
     </div>
