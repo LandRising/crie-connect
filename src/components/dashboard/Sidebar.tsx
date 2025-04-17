@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -126,14 +125,6 @@ export const Sidebar = ({ collapsed, onToggle, isMobileSheet = false, onNavigati
             active={isActive("/dashboard/analytics")}
             collapsed={collapsed && !isMobileSheet}
             onClick={() => handleNavigation("analytics")}
-          />
-          <NavItem 
-            icon={User} 
-            label="Perfil" 
-            href="/dashboard/profile" 
-            active={isActive("/dashboard/profile")}
-            collapsed={collapsed && !isMobileSheet}
-            onClick={() => handleNavigation("profile")}
           />
           <NavItem 
             icon={Settings} 
