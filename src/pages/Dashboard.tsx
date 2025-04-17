@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { useProfile } from "@/hooks/useProfile";
 
-// Import StatsCards correctly with named import instead of default import
+// Import StatsCards correctly with named import
 import { StatsCards } from "@/components/analytics/StatsCards";
 
 const Dashboard = () => {
@@ -75,7 +75,7 @@ const Dashboard = () => {
                   title="Link mais popular"
                   value={stats.topLink}
                   icon="link"
-                  valueIsText
+                  valueIsText={true}
                 />
               </div>
             )}
