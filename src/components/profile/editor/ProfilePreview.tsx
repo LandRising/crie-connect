@@ -98,7 +98,7 @@ export const ProfilePreview = ({ profile, appearance }: ProfilePreviewProps) => 
           <div className="px-4 pt-6 pb-6">
             <div className="flex flex-row items-center gap-4 mb-6">
               {showAvatar && (
-                <div className="h-16 w-16 rounded-full overflow-hidden flex-shrink-0 border-2" style={{borderColor: themeStyles.border}}>
+                <div className="h-16 w-16 rounded-full overflow-hidden flex-shrink-0 border-2" style={{borderColor: themeStyles.border || "#e5e7eb"}}>
                   {profile.avatar_url ? (
                     <img src={profile.avatar_url} alt={profile.username} className="w-full h-full object-cover" />
                   ) : (
@@ -130,7 +130,7 @@ export const ProfilePreview = ({ profile, appearance }: ProfilePreviewProps) => 
           <div className="px-4 py-6">
             {showAvatar && (
               <div className="mb-4 flex justify-center">
-                <div className="h-14 w-14 rounded-full overflow-hidden border-2" style={{borderColor: themeStyles.border}}>
+                <div className="h-14 w-14 rounded-full overflow-hidden border-2" style={{borderColor: themeStyles.border || "#e5e7eb"}}>
                   {profile.avatar_url ? (
                     <img src={profile.avatar_url} alt={profile.username} className="w-full h-full object-cover" />
                   ) : (
@@ -159,7 +159,7 @@ export const ProfilePreview = ({ profile, appearance }: ProfilePreviewProps) => 
             
             <div className="relative z-10 flex flex-col items-center pt-6">
               {showAvatar && (
-                <div className="h-20 w-20 rounded-full overflow-hidden border-4 p-1 bg-background" style={{borderColor: appearance.buttonColor || themeStyles.border}}>
+                <div className="h-20 w-20 rounded-full overflow-hidden border-4 p-1 bg-background" style={{borderColor: appearance.buttonColor || themeStyles.border || "#e5e7eb"}}>
                   {profile.avatar_url ? (
                     <img src={profile.avatar_url} alt={profile.username} className="w-full h-full object-cover rounded-full" />
                   ) : (

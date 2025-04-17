@@ -25,32 +25,37 @@ export const getThemeStyles = (theme: ThemeType) => {
       return {
         background: "bg-gray-900",
         text: "text-white",
-        subtext: "text-gray-300"
+        subtext: "text-gray-300",
+        border: "border-gray-700"
       };
     case "black":
       return {
         background: "bg-black",
         text: "text-white",
-        subtext: "text-gray-400"
+        subtext: "text-gray-400",
+        border: "border-gray-800"
       };
     case "purple":
       return {
         background: "bg-purple-900",
         text: "text-white",
-        subtext: "text-purple-200"
+        subtext: "text-purple-200",
+        border: "border-purple-700"
       };
     case "blue":
       return {
         background: "bg-blue-900",
         text: "text-white",
-        subtext: "text-blue-200"
+        subtext: "text-blue-200",
+        border: "border-blue-700"
       };
     case "light":
     default:
       return {
         background: "bg-white",
         text: "text-black",
-        subtext: "text-gray-500"
+        subtext: "text-gray-500",
+        border: "border-gray-200"
       };
   }
 };

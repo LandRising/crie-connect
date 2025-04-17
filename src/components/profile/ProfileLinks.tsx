@@ -11,6 +11,7 @@ type ProfileLinksProps = {
   getButtonStyles: (buttonStyle: string) => string;
   buttonColor?: string;
   profileId?: string;
+  compact?: boolean; // Added compact prop
 };
 
 export const ProfileLinks = ({ 
@@ -18,7 +19,8 @@ export const ProfileLinks = ({
   buttonStyle, 
   getButtonStyles, 
   buttonColor,
-  profileId = ""
+  profileId = "",
+  compact = false // Default value
 }: ProfileLinksProps) => {
   if (links.length === 0) {
     return <p className="text-center text-gray-500">Nenhum link disponível</p>;
@@ -37,6 +39,9 @@ export const ProfileLinks = ({
     }
   };
 
+  // Apply compact styling if enabled
+  const buttonPadding = compact ? "py-2 px-4" : "py-4 px-6";
+
   return (
     <div className="space-y-3">
       {links.map((link) => (
@@ -51,7 +56,8 @@ export const ProfileLinks = ({
           <Button
             variant="outline"
             className={cn(
-              "w-full justify-between h-auto py-4 px-6 text-base font-medium",
+              "w-full justify-between h-auto text-base font-medium",
+              buttonPadding, // Apply dynamic padding
               getButtonStyles(buttonStyle)
             )}
             style={customColor}
